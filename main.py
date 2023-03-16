@@ -823,10 +823,12 @@ async def on_message(message):
         if (content.isdigit()) and (len(content) == 4):
             endTime = int(content)
             nowTime = datetime.datetime.now()
+            print("4桁の数字を検知")
+            print(nowTime)
             
-            if(nowTime.hour >= 20 & nowTime.hour <= 21):                
-                r = requests.get(f"https://script.google.com/macros/s/AKfycbwbnKzSsQLFjmKoPQQ9DQSE-zOHyQTk_yw0OHTlRLKEfAoijQVpMNlNm40mGcq-G2qX/exec?hours={endTime / 100}&minutes={endTime % 100}")
-                await message.channel.send(f"就業時刻を`{endTime / 100}時{endTime % 100}分`をして記録しました")
+            if(nowTime.hour >= 20 and nowTime.hour <= 21):                
+                r = requests.get(f"https://script.google.com/macros/s/AKfycbwbnKzSsQLFjmKoPQQ9DQSE-zOHyQTk_yw0OHTlRLKEfAoijQVpMNlNm40mGcq-G2qX/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
+                await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
 
 @client.event
 async def on_guild_join(guild):
