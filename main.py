@@ -21,7 +21,7 @@ url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
-    "TOKEN": "OTkxMTU2NTA4NzgxOTY5NDM4.G2V5Wo.lgUAo5LU6rJS1mgXKHhIAvvl_-aKA8QuPyBb64",
+    "TOKEN": "",
     "PLAYING":"人生",
     "SN":{
         "USER":"",
