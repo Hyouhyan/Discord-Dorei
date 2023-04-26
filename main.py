@@ -61,7 +61,7 @@ BUS_DIAGRAM = {}
 BUS_ABC = {}
 
 BUS_DIAGRAM_PATH = "./data/ait/bus_diagram-R4.json"
-BUS_ABC_PATH = "./data/ait/bus_ABC-R4.json"
+BUS_ABC_PATH = "./data/ait/bus_ABC-R5.json"
 
 BUS_LAST = 21
 BUS_FIRST = 8
@@ -409,15 +409,15 @@ async def on_message(message):
     print(f"{message.channel.id} {message.channel}メッセージ検知")
     print(f"\t{message.content}")
 
-    logRoom = client.get_channel(1035225346431275138)
-    embed = discord.Embed(title = message.content)
-    try:
-        embed.add_field(name = "送信先", value = f"{message.guild.name} {message.channel.name}")
-    except:
-        embed.add_field(name = "送信先", value = f"DM")
-    embed.set_author(name = message.author.name,icon_url = message.author.avatar.url)
-    embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
-    await logRoom.send(embed = embed)
+    # logRoom = client.get_channel(1035225346431275138)
+    # embed = discord.Embed(title = message.content)
+    # try:
+    #     embed.add_field(name = "送信先", value = f"{message.guild.name} {message.channel.name}")
+    # except:
+    #     embed.add_field(name = "送信先", value = f"DM")
+    # embed.set_author(name = message.author.name,icon_url = message.author.avatar.url)
+    # embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
+    # await logRoom.send(embed = embed)
     
     # ユーザーレベルの特定
     if message.author.id in USERS["OWNER"]:
@@ -689,7 +689,7 @@ async def on_message(message):
                 if content == "":
                     embed = bus_mdh(bus_m, bus_d, bus_h)
                 else:
-                    if(content == "next"):
+                    if(content == "next" or content == "n"):
                         bus_h = int(bus_h) + 1
                         if(bus_h > BUS_LAST):
                             bus_h = BUS_FIRST
@@ -732,7 +732,7 @@ async def on_message(message):
                 if content == "":
                     embed = idou_ymd(idou_y, idou_m, idou_d)
             
-                elif(content == "next"):
+                elif(content == "next" or content == "n"):
                     # 翌日
                     idou_d += 1
 
@@ -821,14 +821,32 @@ async def on_message(message):
     if (message.guild is None) and (message.author.id in USERS["OWNER"]):
         # メッセージが4桁の数字の場合
         if (content.isdigit()) and (len(content) == 4):
-            endTime = int(content)
             nowTime = datetime.datetime.now()
             print("4桁の数字を検知")
-            print(nowTime)
+            print(nowTime.hour)
             
-            if(nowTime.hour >= 20 and nowTime.hour <= 21):                
-                r = requests.get(f"https://script.google.com/macros/s/AKfycbwbnKzSsQLFjmKoPQQ9DQSE-zOHyQTk_yw0OHTlRLKEfAoijQVpMNlNm40mGcq-G2qX/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
+            if(nowTime.hour >= 20 and nowTime.hour <= 21):
+                endTime = dakoku(content)
                 await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+                
+        if content.startswith("dkk"):
+            print("dakoku")
+            content = rmprefix(content, "dkk")
+            if (content.isdigit()) and (len(content) == 4):
+                endTime = dakoku(content)
+                await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+            else:
+                await message.channel.send(f"なんか変です。時刻の指定間違ってませんか？")
+            
+def dakoku(endTime):
+    endTime = int(endTime)          
+    r = requests.get(f"https://script.google.com/macros/s/AKfycbyAQcMRl5IWofPgnOVoufi8DOz4FHf0gpskiS9ETshgt75HJcAhkns3Ule83rZ6VpJa/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
+    print(f"打刻しました。${endTime}")
+    
+    r = requests.get("https://script.google.com/macros/s/AKfycbxXFf7RGM0Qx3fEsWdo64k6SVIJ1FqSxsBRob78RxcNtWoAqbe6B1FCacmCfarOzPVj6g/exec")
+    print("給料を更新しました")
+    
+    return endTime
 
 @client.event
 async def on_guild_join(guild):
