@@ -255,7 +255,7 @@ def save_all():
 
 #jsonファイルの読み込み
 def load():
-    global GLOBAL_SETTINGS, BUS_DIAGRAM, BUS_ABC, LOCAL_SETTINGS, USERS, TIMETABLE_ID_NAME
+    global GLOBAL_SETTINGS, BUS_DIAGRAM, BUS_ABC, LOCAL_SETTINGS, USERS
 
     file = open(GLOBAL_SETTINGS_PATH, 'r')
     GLOBAL_SETTINGS = json.load(file)
@@ -674,17 +674,6 @@ async def on_message(message):
                 file.close()
                 data = data.replace("==", LOCAL_SETTINGS[str(guild_id)]["PREFIX"])
                 await message.channel.send(data)
-            
-            # 時間割
-            if content.startswith("timetable"):
-                content = rmprefix(content, "timetable")
-                if content == "":
-                    try:
-                        await message.channel.send(embed = timetable(TIMETABLE_ID_NAME[str(message.author.id)]))
-                    except:
-                        await message.channel.send(embed = timetable(message.author.name))
-                else:
-                    await message.channel.send(embed = timetable(content))
             
             # QRコード
             if content.startswith("qr"):
