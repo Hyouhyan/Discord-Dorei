@@ -1,7 +1,6 @@
 import discord
 import json
 import datetime
-import simplenote
 import re
 import requests
 import os
@@ -22,11 +21,7 @@ url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
     "TOKEN": "",
-    "PLAYING":"人生",
-    "SN":{
-        "USER":"",
-        "PASS":""
-    }
+    "PLAYING":"人生"
 }
 
 # ローカル(サーバーごとの)設定
@@ -50,11 +45,6 @@ HELPALL_PATH = "./data/help_other.txt"
 # 参加してるサーバー一覧
 GUILDS_PATH = "./data/guilds.json"
 GUILDS = {}
-
-# メモ関係のやつ
-memo_flg = False
-memo_value = ""
-
 
 # バス関係のやつ
 BUS_DIAGRAM = {}
@@ -287,11 +277,6 @@ def load():
     BUS_ABC = json.load(file)
     file.close()
 
-    file = open(f"{TIMETABLE_DIR}id_name.json", 'r')
-    TIMETABLE_ID_NAME = json.load(file)
-    file.close()
-    
-
 #removeprefixのやつ
 def rmprefix(content, prefix):
     content = content.removeprefix(prefix)
@@ -317,79 +302,8 @@ def update_guilds():
     save.guilds()
     print("サーバー辞書更新")
 
-
-# 時間割
-TIMETABLE_DIR = "./data/ait/timetable/"
-TIMETABLE_ID_NAME = {}
-
-def timetable(name):
-    dt_now = datetime.datetime.now()
-
-    if os.path.exists(f"{TIMETABLE_DIR}{name}.json"):
-        embed = discord.Embed(title="本日の時間割")
-        file = open(f"{TIMETABLE_DIR}{name}.json", 'r')
-        reader = json.load(file)
-        file.close()
-
-        if reader[dt_now.strftime('%a')] is None:
-            embed = discord.Embed(title="本日の予定", description=f"今日は全休です")
-        else:
-            for i in range(1, 5):
-                try:
-                    reader[dt_now.strftime('%a')][str(i)]
-                except:
-                    value = "なし"
-                    title = ""
-                else:
-                    title = reader[dt_now.strftime('%a')][str(i)]['title']
-                    value = f"{reader[dt_now.strftime('%a')][str(i)]['teacher']}\n{reader[dt_now.strftime('%a')][str(i)]['room']}"
-                
-                embed.add_field(name=f"{i}限 {title}", value=value, inline=False)
-
-    else:
-        embed = discord.Embed(title="エラー", description=f"該当ユーザー`{name}`の時間割はありません", color=discord.Color.red())
-    
-    return embed
-
-# morning
-def morning(name):
-    dt_now = datetime.datetime.now()
-
-    embed = discord.Embed(title="おはようございます")
-
-    # 時間割
-    if os.path.exists(f"{TIMETABLE_DIR}{name}.json"):
-        file = open(f"{TIMETABLE_DIR}{name}.json", 'r')
-        reader = json.load(file)
-        file.close()
-
-        if reader[dt_now.strftime('%a')] is None:
-            Value = "本日は全休です"
-        else:
-            for i in range(1, 5):
-                value += f"{i}限 "
-                try:
-                    reader[dt_now.strftime('%a')][str(i)]
-                except:
-                    value += "なし"
-                else:
-                    value += reader[dt_now.strftime('%a')][str(i)]['title']
-                    value += f"({reader[dt_now.strftime('%a')][str(i)]['room']})"
-                
-                value += "\n"
-
-        embed.add_field(name=f"時間割", value=value)
-
-    else:
-        embed = discord.Embed(title="エラー", description=f"該当ユーザー`{name}`の時間割はありません", color=discord.Color.red())
-    
-    return embed
-
 # ここから本編
 load()
-
-# Simplenote用意
-sn = simplenote.Simplenote(GLOBAL_SETTINGS["SN"]["USER"], GLOBAL_SETTINGS["SN"]["PASS"])
 
 @client.event
 async def on_ready():
@@ -400,7 +314,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global GLOBAL_SETTINGS, LOCAL_SETTINGS, GUILDS, USERS, memo_flg, memo_value
+    global GLOBAL_SETTINGS, LOCAL_SETTINGS, GUILDS, USERS
 
     # botからのメッセージは無視する
     if message.author.bot:
@@ -442,22 +356,6 @@ async def on_message(message):
     
     
     content = message.content
-
-    if memo_flg and userLevel >= 10:
-        if content == f"{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}end":
-            sn.add_note(memo_value)
-            await message.channel.send(f'記録終了、保存しました')
-            # 後片付け
-            memo_flg = False
-            memo_value = ""
-            return
-        elif content == f"{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}n":
-            memo_value += '\n'
-            await message.channel.send('改行しました')
-            return
-        else:
-            memo_value += (content + '\n')
-            return
 
     # prefixで始まってたら
     if content.startswith(LOCAL_SETTINGS[str(guild_id)]["PREFIX"]):
@@ -558,17 +456,8 @@ async def on_message(message):
                 await message.channel.send("シャットダウンしています")
                 save_all()
                 await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.offline)
+                await client.close()
                 exit()
-            
-            if content.startswith("memo"):
-                content = rmprefix(content, "memo")
-
-                # memo_flgをTrueにする
-                memo_flg = True
-
-                await message.channel.send(f'記録開始。`{LOCAL_SETTINGS[str(guild_id)]["PREFIX"]}end`で終了')
-                # 一応初期化
-                memo_value = ''
             
             if content.startswith("pocket"):
                 content = rmprefix(content, "pocket")
@@ -843,7 +732,7 @@ def dakoku(endTime):
     r = requests.get(f"https://script.google.com/macros/s/AKfycbyAQcMRl5IWofPgnOVoufi8DOz4FHf0gpskiS9ETshgt75HJcAhkns3Ule83rZ6VpJa/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
     print(f"打刻しました。${endTime}")
     
-    r = requests.get("https://script.google.com/macros/s/AKfycbxXFf7RGM0Qx3fEsWdo64k6SVIJ1FqSxsBRob78RxcNtWoAqbe6B1FCacmCfarOzPVj6g/exec")
+    r = requests.get("https://script.google.com/macros/s/AKfycbzpzMbc0ED04LlE_S6QgxZN-hJ4YhJVdA-yoe8Tv81mhbJGAwRCkmliQ-1NanWLmE3o5w/exec")
     print("給料を更新しました")
     
     return endTime
