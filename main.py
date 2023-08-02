@@ -718,12 +718,9 @@ async def on_message(message):
             
 def dakoku(endTime):
     endTime = int(endTime)          
-    r = requests.get(f"https://script.google.com/macros/s/AKfycbyAQcMRl5IWofPgnOVoufi8DOz4FHf0gpskiS9ETshgt75HJcAhkns3Ule83rZ6VpJa/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
+    r = requests.get(f"https://script.google.com/macros/s/AKfycbwkqWNrXiQPOqNKudoxzQGuWHqvou4XA_tHn-cusnrOcPa4qyhgDLjZK6xN_RFeuMwr/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
     print(f"打刻しました。${endTime}")
-    
-    r = requests.get("https://script.google.com/macros/s/AKfycbzpzMbc0ED04LlE_S6QgxZN-hJ4YhJVdA-yoe8Tv81mhbJGAwRCkmliQ-1NanWLmE3o5w/exec")
-    print("給料を更新しました")
-    
+
     return endTime
 
 @client.event
