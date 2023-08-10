@@ -15,7 +15,7 @@ client = discord.Client(intents = intents)
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 
 # 給料のURL from gas
-# SalaryURL = "https://script.google.com/macros/s/AKfycbxLTAbpLHqmmUOBv98STGoYTAHzubswlqq6tqKfVlrs1tx22rl6YHCIOF6GweVmv39ibA/exec"
+SalaryURL = "https://script.google.com/macros/s/AKfycbxY4vjyAHM97P9Rs2i9A0T3lxbusD3zyY5jBPsx51-cyMwivEkByfasrSpI2GSOxafa/exec"
 
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
@@ -718,7 +718,7 @@ async def on_message(message):
             
 def dakoku(endTime):
     endTime = int(endTime)          
-    r = requests.get(f"https://script.google.com/macros/s/AKfycbwkqWNrXiQPOqNKudoxzQGuWHqvou4XA_tHn-cusnrOcPa4qyhgDLjZK6xN_RFeuMwr/exec?hours={int(endTime / 100)}&minutes={endTime % 100}")
+    r = requests.get(f"{SalaryURL}?hours={int(endTime / 100)}&minutes={endTime % 100}")
     print(f"打刻しました。${endTime}")
 
     return endTime
