@@ -15,7 +15,7 @@ client = discord.Client(intents = intents)
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 
 # 給料のURL from gas
-SalaryURL = "https://script.google.com/macros/s/AKfycbxY4vjyAHM97P9Rs2i9A0T3lxbusD3zyY5jBPsx51-cyMwivEkByfasrSpI2GSOxafa/exec"
+SalaryURL = "https://script.google.com/macros/s/AKfycbzmEvS_ty_6vMTHSeEVbVry9Xhj4AlOO6xZlnOCooxjzR85rCDfCLemiqifTY2TTXZh/exec"
 
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
