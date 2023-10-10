@@ -5,7 +5,6 @@ import re
 import requests
 import os
 import qrcode
-import csv
 
 import bus
 import idou

@@ -1,4 +1,5 @@
 import csv
+import discord
 
 # 移動販売
 IDOU_DIR_PATH = "./data/ait/idou/"
