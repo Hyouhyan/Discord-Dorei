@@ -5,7 +5,7 @@ import discord
 BUS_DIAGRAM = {}
 BUS_ABC = {}
 
-BUS_DIAGRAM_PATH = "./data/ait/bus_diagram-R4.json"
+BUS_DIAGRAM_PATH = "./data/ait/bus_diagram-R5.json"
 BUS_ABC_PATH = "./data/ait/bus_ABC-R5.json"
 
 BUS_LAST = 21
