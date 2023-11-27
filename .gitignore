@@ -3,3 +3,4 @@ test.py
 *_settings.json
 guilds.json
 users.json
+__pycache__
