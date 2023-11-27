@@ -8,6 +8,7 @@ import qrcode
 
 import bus
 import idou
+import qrMaker
 
 intents = discord.Intents.all()
 
@@ -501,11 +502,19 @@ async def on_message(message):
             
             # QRコード
             if content.startswith("qr"):
+                QR_TEMP_PATH = "./temp/qr.png"
+                QR_LOGO_TEMP_PATH = "./temp/qr-logo.png"
                 content = rmprefix(content, "qr")
-                img = qrcode.make(content)
-                img.save("./temp/qr.png")
-                await message.channel.send(file=discord.File("./temp/qr.png"))
-                os.remove("./temp/qr.png")
+                if message.attachments:
+                    file = message.attachments[0]
+                    await file.save(QR_LOGO_TEMP_PATH)
+                    qrMaker.encode_qr_with_logo(content, QR_LOGO_TEMP_PATH, QR_TEMP_PATH)
+                    os.remove(QR_LOGO_TEMP_PATH)
+                else:
+                    img = qrcode.make(content)
+                    img.save(QR_TEMP_PATH)
+                await message.channel.send(file=discord.File(QR_TEMP_PATH))
+                os.remove(QR_TEMP_PATH)
                 return
             
             # ping
