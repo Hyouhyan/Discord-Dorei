@@ -1,8 +1,10 @@
 import csv
 import discord
+import requests
 
 # 移動販売
-IDOU_DIR_PATH = "./data/ait/idou/"
+IDOU_DIR_URL = "https://gh.hyouhyan.com/ait-info/idou/"
+
 def idou_ymd(year, month, day):
     
     # str型(表示用)
@@ -17,11 +19,15 @@ def idou_ymd(year, month, day):
     try:
         # csvをリストに変換
         # エラーポイント1 オープン時のエラー
-        file = open(f"{IDOU_DIR_PATH}{year}{tume_m}.csv")
+        # URLから取得
+        file = requests.get(f"{IDOU_DIR_URL}{year}{tume_m}.csv").text.splitlines()
+        print(file)
         reader = csv.reader(file)
+        print(reader)
 
         # dayに相当する要素を検索
         for i in reader:
+            print(i)
             if(i[0] == str(day)):
                 schedule = i
                 break
