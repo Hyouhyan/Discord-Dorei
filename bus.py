@@ -1,25 +1,21 @@
 import json
 import discord
+import requests
 
 # バス関係のやつ
 BUS_DIAGRAM = {}
 BUS_ABC = {}
 
-BUS_DIAGRAM_PATH = "./data/ait/bus_diagram-R5.json"
-BUS_ABC_PATH = "./data/ait/bus_ABC-R5.json"
+BUS_DIAGRAM_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_diagram-R5.json"
+BUS_ABC_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_ABC-R5.json"
 
 BUS_LAST = 21
 BUS_FIRST = 8
 
 def load():
     global BUS_DIAGRAM, BUS_ABC
-    file = open(BUS_DIAGRAM_PATH, 'r')
-    BUS_DIAGRAM = json.load(file)
-    file.close()
-
-    file = open(BUS_ABC_PATH, 'r')
-    BUS_ABC = json.load(file)
-    file.close()
+    BUS_DIAGRAM = requests.get(BUS_DIAGRAM_URL).json()
+    BUS_ABC = requests.get(BUS_ABC_URL).json()
 
 
 def bus_mdh(bus_m, bus_d, bus_h):
