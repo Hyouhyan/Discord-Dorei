@@ -513,7 +513,7 @@ async def on_message(message):
                 else:
                     img = qrcode.make(content)
                     img.save(QR_TEMP_PATH)
-                await message.channel.send(file=discord.File(QR_TEMP_PATH))
+                await message.channel.send(content=content, file=discord.File(QR_TEMP_PATH))
                 os.remove(QR_TEMP_PATH)
                 return
             
