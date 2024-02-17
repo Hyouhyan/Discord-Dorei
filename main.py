@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 import json
 import datetime
 import re
@@ -13,6 +14,8 @@ import qrMaker
 intents = discord.Intents.all()
 
 client = discord.Client(intents = intents)
+
+commandTree = app_commands.CommandTree(client)
 
 # URLパターン
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
@@ -115,6 +118,7 @@ def initialize():
         if not i in LOCAL_SETTINGS:
             LOCAL_SETTINGS[i] = {}
             LOCAL_SETTINGS[i]["PREFIX"] = "=="
+        commandTree.clear_commands(guild = discord.Object(id = int(i)))
     print("初期化完了")
     save.local_settings()
     save.guilds()
@@ -136,6 +140,11 @@ async def on_ready():
     update_guilds()
     initialize()
     await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
+    await commandTree.sync()
+
+@commandTree.command(name="test", description="テストコマンドです")
+async def test_command(interaction: discord.Interaction):
+    await interaction.response.send_message("てすと！",ephemeral=True)
 
 @client.event
 async def on_message(message):
