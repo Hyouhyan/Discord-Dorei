@@ -378,65 +378,6 @@ async def on_message(message):
             if content.startswith("paku"):
                 await message.channel.send('ピピーッ❗️🔔⚡️パクツイ警察です❗️👊👮❗️アナタのツイート💕は❌パクツイ禁止法❌第114514条🙋「他人の面白そうなツイートをツイート💕してゎイケナイ❗️」に違反しています😡今スグ消しなｻｲ❗️❗️❗️❗️✌️👮🔫')
                 return
-        
-            # bus
-            if content.startswith("bus"):
-                content = rmprefix(content, "bus")
-
-                # 日付取得
-                dt_now = datetime.datetime.now()
-                bus_y = (dt_now.year)
-                bus_m = (dt_now.month)
-                bus_d = (dt_now.day)
-                bus_h = (dt_now.hour)
-
-                if(bus_h < 8):
-                    bus_h = 8
-                if(bus_h > 21):
-                    bus_h = 8
-                    bus_d += 1
-
-                    if(not checkDate(bus_y, bus_m, bus_d)):
-                        bus_d = 1
-                        if(bus_m == 12):
-                            bus_m = 1
-                        else:
-                            bus_m += 1
-
-                # 日付取得ここまで
-                
-                if content == "":
-                    embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-                else:
-                    if(content == "next" or content == "n"):
-                        bus_h = int(bus_h) + 1
-                        if(bus_h > bus.BUS_LAST):
-                            bus_h = bus.BUS_FIRST
-                        embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-                    
-                    elif(content.isdigit()):
-                        if(len(content) == 2 or len(content) == 1):
-                            # contentは時間帯
-                            # 0詰めさせないためのint変換
-                            bus_h = int(content)
-                            embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-                            
-                        elif(len(content) == 6):
-                            result = list(content)
-                            bus_m = int(result[0] + result[1])
-                            bus_d = int(result[2] + result[3])
-                            bus_h = int(result[4] + result[5])
-
-                            embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-
-                        else:
-                            embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-                            embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}bus 120120`\n本日20時台の場合\n`{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}bus 20`", inline=False)
-
-                    else:
-                        embed = discord.Embed(title="エラー", description=f"指定された引数「{content}」は無効です。", color=discord.Colour.red())
-
-                await message.channel.send(embed=embed)
             
             # 移動販売
             if content.startswith("idou"):
@@ -538,11 +479,6 @@ def dakoku(endTime):
 
 
 
-@commandTree.command(name="test", description="テストコマンドです")
-async def test_command(interaction: discord.Interaction):
-    await interaction.response.send_message("てすと！",ephemeral=True)
-
-
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
 async def dkk_command(interaction: discord.Interaction, time: int):
     if(interaction.user.id in USERS["OWNER"]):
@@ -567,6 +503,63 @@ async def qr_command(interaction: discord.Interaction, content: str, logo:discor
     await interaction.response.send_message(content=content, file=discord.File(QR_TEMP_PATH))
     os.remove(QR_TEMP_PATH)
 
+
+@commandTree.command(name="bus", description="バスの時刻表を表示します")
+async def bus_command(interaction: discord.Interaction, content: str = ""):
+    # 日付取得
+    dt_now = datetime.datetime.now()
+    bus_y = (dt_now.year)
+    bus_m = (dt_now.month)
+    bus_d = (dt_now.day)
+    bus_h = (dt_now.hour)
+
+    if(bus_h < 8):
+        bus_h = 8
+    if(bus_h > 21):
+        bus_h = 8
+        bus_d += 1
+
+        if(not checkDate(bus_y, bus_m, bus_d)):
+            bus_d = 1
+            if(bus_m == 12):
+                bus_m = 1
+            else:
+                bus_m += 1
+
+    if content == "":
+        embed = bus.bus_mdh(bus_m, bus_d, bus_h)
+    else:
+        if(content == "next" or content == "n"):
+            bus_h = int(bus_h) + 1
+            if(bus_h > bus.BUS_LAST):
+                bus_h = bus.BUS_FIRST
+            embed = bus.bus_mdh(bus_m, bus_d, bus_h)
+        
+        elif(content.isdigit()):
+            if(len(content) == 2 or len(content) == 1):
+                # contentは時間帯
+                # 0詰めさせないためのint変換
+                bus_h = int(content)
+                embed = bus.bus_mdh(bus_m, bus_d, bus_h)
+                
+            elif(len(content) == 6):
+                result = list(content)
+                bus_m = int(result[0] + result[1])
+                bus_d = int(result[2] + result[3])
+                bus_h = int(result[4] + result[5])
+
+                embed = bus.bus_mdh(bus_m, bus_d, bus_h)
+
+            else:
+                embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
+                embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`bus 120120`\n本日20時台の場合\n`bus 20`", inline=False)
+
+        else:
+            embed = discord.Embed(title="エラー", description=f"指定された引数「{content}」は無効です。", color=discord.Colour.red())
+            
+    await interaction.response.send_message(embed=embed)
+    
+    
 
 
 @client.event
