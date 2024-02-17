@@ -142,11 +142,6 @@ async def on_ready():
     await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
     await commandTree.sync()
 
-@commandTree.command(name="test", description="テストコマンドです")
-async def test_command(interaction: discord.Interaction):
-    await interaction.response.send_message("てすと！",ephemeral=True)
-
-
 @client.event
 async def on_message(message):
     global GLOBAL_SETTINGS, LOCAL_SETTINGS, GUILDS, USERS
@@ -510,23 +505,6 @@ async def on_message(message):
                 data = data.replace("==", LOCAL_SETTINGS[str(guild_id)]["PREFIX"])
                 await message.channel.send(data)
             
-            # QRコード
-            if content.startswith("qr"):
-                QR_TEMP_PATH = "./temp/qr.png"
-                QR_LOGO_TEMP_PATH = "./temp/qr-logo.png"
-                content = rmprefix(content, "qr")
-                if message.attachments:
-                    file = message.attachments[0]
-                    await file.save(QR_LOGO_TEMP_PATH)
-                    qrMaker.encode_qr_with_logo(content, QR_LOGO_TEMP_PATH, QR_TEMP_PATH)
-                    os.remove(QR_LOGO_TEMP_PATH)
-                else:
-                    img = qrcode.make(content)
-                    img.save(QR_TEMP_PATH)
-                await message.channel.send(content=content, file=discord.File(QR_TEMP_PATH))
-                os.remove(QR_TEMP_PATH)
-                return
-            
             # ping
             if content == "ping":
                 # Ping値を秒単位で取得
@@ -549,22 +527,47 @@ async def on_message(message):
             if(nowTime.hour >= 20 and nowTime.hour <= 21):
                 endTime = dakoku(content)
                 await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
-                
-        if content.startswith("dkk"):
-            print("dakoku")
-            content = rmprefix(content, "dkk")
-            if (content.isdigit()) and (len(content) == 4):
-                endTime = dakoku(content)
-                await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
-            else:
-                await message.channel.send(f"なんか変です。時刻の指定間違ってませんか？")
-            
+
+
 def dakoku(endTime):
     endTime = int(endTime)          
     r = requests.get(f"{SalaryURL}?hours={int(endTime / 100)}&minutes={endTime % 100}")
     print(f"打刻しました。${endTime}")
 
     return endTime
+
+
+
+@commandTree.command(name="test", description="テストコマンドです")
+async def test_command(interaction: discord.Interaction):
+    await interaction.response.send_message("てすと！",ephemeral=True)
+
+
+@commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
+async def dkk_command(interaction: discord.Interaction, time: int):
+    if(interaction.user.id in USERS["OWNER"]):
+        endTime = dakoku(time)
+        await interaction.response.send_message(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+    else:
+        await interaction.response.send_message("オーナー様ではありません")
+
+
+@commandTree.command(name="qr", description="QRコードを生成します")
+async def qr_command(interaction: discord.Interaction, content: str, logo:discord.Attachment = None):
+    QR_TEMP_PATH = "./temp/qr.png"
+    QR_LOGO_TEMP_PATH = "./temp/qr-logo.png"
+    if logo:
+        file = logo
+        await file.save(QR_LOGO_TEMP_PATH)
+        qrMaker.encode_qr_with_logo(content, QR_LOGO_TEMP_PATH, QR_TEMP_PATH)
+        os.remove(QR_LOGO_TEMP_PATH)
+    else:
+        img = qrcode.make(content)
+        img.save(QR_TEMP_PATH)
+    await interaction.response.send_message(content=content, file=discord.File(QR_TEMP_PATH))
+    os.remove(QR_TEMP_PATH)
+
+
 
 @client.event
 async def on_guild_join(guild):
