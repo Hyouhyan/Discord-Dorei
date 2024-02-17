@@ -146,6 +146,7 @@ async def on_ready():
 async def test_command(interaction: discord.Interaction):
     await interaction.response.send_message("てすと！",ephemeral=True)
 
+
 @client.event
 async def on_message(message):
     global GLOBAL_SETTINGS, LOCAL_SETTINGS, GUILDS, USERS
