@@ -380,83 +380,7 @@ async def on_message(message):
                 await message.channel.send('ピピーッ❗️🔔⚡️パクツイ警察です❗️👊👮❗️アナタのツイート💕は❌パクツイ禁止法❌第114514条🙋「他人の面白そうなツイートをツイート💕してゎイケナイ❗️」に違反しています😡今スグ消しなｻｲ❗️❗️❗️❗️✌️👮🔫')
                 return
             
-            # 移動販売
-            if content.startswith("idou"):
-                content = rmprefix(content, "idou")
 
-                # 日付取得
-                dt_now = datetime.datetime.now()
-                idou_y = (dt_now.year)
-                idou_m = (dt_now.month)
-                idou_d = (dt_now.day)
-
-                if content == "":
-                    embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-            
-                elif(content == "next" or content == "n"):
-                    # 翌日
-                    idou_d += 1
-
-                    # 翌日が存在しない日だった場合
-                    if(not checkDate(idou_y, idou_m, idou_d)):
-                        idou_d = 1
-                        # さらに年末だった場合
-                        if(idou_m == 12):
-                            idou_m = 1
-                            idou_y += 1
-                        else:
-                            idou_m += 1
-                    
-                    embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-                
-                elif(content.isdigit()):
-                    if(len(content) == 2 or len(content) == 1):
-                        # 0詰めさせないためのint変換
-                        idou_d = int(content)
-                        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-                    elif(len(content) == 4):
-                        result = list(content)
-                        idou_m = int(result[0] + result[1])
-                        idou_d = int(result[2] + result[3])
-                        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-                    
-                    elif(len(content) == 8):
-                        result = list(content)
-                        idou_y = int(result[0] + result[1] + result[2] + result[3])
-                        idou_m = int(result[4] + result[5])
-                        idou_d = int(result[6] + result[7])
-                        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-                    else:
-                        embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-                        embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(guild_id)]['PREFIX']}idou 20220112`", inline=False)
-                
-                await message.channel.send(embed=embed)
-
-
-            # help
-            if content.startswith("help"):
-                content = rmprefix(content, "help")
-                if(content == "all"):
-                    file = open(HELPALL_PATH, 'r')
-                else:
-                    file = open(HELP_PATH, 'r')
-                data = file.read()
-                file.close()
-                data = data.replace("==", LOCAL_SETTINGS[str(guild_id)]["PREFIX"])
-                await message.channel.send(data)
-            
-            # ping
-            if content == "ping":
-                # Ping値を秒単位で取得
-                raw_ping = client.latency
-
-                # ミリ秒に変換して丸める
-                ping = round(raw_ping * 1000)
-
-                # 送信する
-                await message.channel.send(f"Latency: {ping}ms")
                 
     # オーナーのDMの場合
     if (message.guild is None) and (message.author.id in USERS["OWNER"]):
@@ -559,8 +483,81 @@ async def bus_command(interaction: discord.Interaction, content: str = ""):
             embed = discord.Embed(title="エラー", description=f"指定された引数「{content}」は無効です。", color=discord.Colour.red())
             
     await interaction.response.send_message(embed=embed)
+
+
+@commandTree.command(name="idou", description="移動販売のスケジュールを表示します")
+async def idou_command(interaction: discord.Interaction, content: str = ""):
+    # 日付取得
+    dt_now = datetime.datetime.now()
+    idou_y = (dt_now.year)
+    idou_m = (dt_now.month)
+    idou_d = (dt_now.day)
+
+    if content == "":
+        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
+    
+    elif(content == "next" or content == "n"):
+        # 翌日
+        idou_d += 1
+
+        # 翌日が存在しない日だった場合
+        if(not checkDate(idou_y, idou_m, idou_d)):
+            idou_d = 1
+            # さらに年末だった場合
+            if(idou_m == 12):
+                idou_m = 1
+                idou_y += 1
+            else:
+                idou_m += 1
+        
+        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
+    
+    elif(content.isdigit()):
+        if(len(content) == 2 or len(content) == 1):
+            # 0詰めさせないためのint変換
+            idou_d = int(content)
+            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
+
+        elif(len(content) == 4):
+            result = list(content)
+            idou_m = int(result[0] + result[1])
+            idou_d = int(result[2] + result[3])
+            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
+        
+        elif(len(content) == 8):
+            result = list(content)
+            idou_y = int(result[0] + result[1] + result[2] + result[3])
+            idou_m = int(result[4] + result[5])
+            idou_d = int(result[6] + result[7])
+            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
+
+        else:
+            embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
+            embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20220112`", inline=False)
+            
+            
+    await interaction.response.send_message(embed=embed)
+
+
+@commandTree.command(name="ping", description="Ping値を表示します")
+async def ping_command(interaction: discord.Interaction):
+    # Ping値を秒単位で取得
+    raw_ping = client.latency
+
+    # ミリ秒に変換して丸める
+    ping = round(raw_ping * 1000)
+
+    # 送信する
+    await interaction.response.send_message(f"Latency: {ping}ms", ephemeral=True)
     
     
+@commandTree.command(name="help", description="ヘルプを表示します")
+async def help_command(interaction: discord.Interaction):
+    file = open(HELP_PATH, 'r')
+    data = file.read()
+    file.close()
+    data = data.replace("==", LOCAL_SETTINGS[str(interaction.guild_id)]["PREFIX"])
+    await interaction.response.send_message(data, ephemeral=True)
 
 
 @client.event
