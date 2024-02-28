@@ -381,6 +381,14 @@ async def help_command(interaction: discord.Interaction):
     await interaction.response.send_message(data, ephemeral=True)
 
 
+@commandTree.command(name="helpall", description="全てのヘルプを表示します")
+async def helpall_command(interaction: discord.Interaction):
+    file = open(HELPALL_PATH, 'r')
+    data = file.read()
+    file.close()
+    await interaction.response.send_message(data, ephemeral=True)
+
+
 @commandTree.command(name="whoami", description="自分の情報を表示します")
 async def whoami_command(interaction: discord.Interaction):
     user = interaction.user
