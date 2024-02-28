@@ -370,13 +370,27 @@ def dakoku(endTime):
 
     return endTime
 
+def is_owner(user):
+    return user.id in USERS["OWNER"]
 
+def is_mod(user):
+    return user.id in USERS["MOD"] or is_owner(user)
 
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
 async def dkk_command(interaction: discord.Interaction, time: int):
-    if(interaction.user.id in USERS["OWNER"]):
+    if(is_owner(interaction.user)):
         endTime = dakoku(time)
         await interaction.response.send_message(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+    else:
+        await interaction.response.send_message("オーナー様ではありません")
+
+@commandTree.command(name="shutdown", description="Botをシャットダウンします。(オーナー様専用)")
+async def shutdown_command(interaction: discord.Interaction):
+    if(is_owner(interaction.user)):
+        save_all()
+        await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.dnd)
+        await client.close()
+        exit()
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
