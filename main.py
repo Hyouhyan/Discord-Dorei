@@ -167,14 +167,14 @@ async def on_message(message):
             print(nowTime.hour)
             
             if(nowTime.hour >= 20 and nowTime.hour <= 21):
-                endTime = dakoku(content)
-                await message.channel.send(f"{datetime.datetime.now.strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+                await message.channel.send(dakoku(content))
 
 
 def dakoku(endTime):
     endTime = int(endTime)          
     r = requests.get(f"{SalaryURL}?hours={int(endTime / 100)}&minutes={endTime % 100}")
-    print(f"打刻しました。${endTime}")
+    print(f"打刻しました。{endTime}")
+    return f"{datetime.datetime.now().strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました"
 
     return endTime
 
@@ -187,8 +187,7 @@ def is_mod(user):
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
 async def dkk_command(interaction: discord.Interaction, time: int):
     if(is_owner(interaction.user)):
-        endTime = dakoku(time)
-        await interaction.response.send_message(f"{datetime.datetime.now.strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+        await interaction.response.send_message(dakoku(time))
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
