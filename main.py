@@ -154,7 +154,7 @@ async def on_message(message):
     print(f"{message.channel.id} {message.channel}メッセージ検知")
     print(f"\t{message.content}")
     
-    if message.content in ["idou", "bus"]:
+    if message.content in ["idou", "bus", "==idou", "==bus"]:
         await message.channel.send("該当コマンドはスラッシュコマンドに移行しました。`/help`で確認してください。")
 
     # オーナーのDMの場合
