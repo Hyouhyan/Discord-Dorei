@@ -346,22 +346,7 @@ async def on_message(message):
                 return
         
 
-        if userLevel >= 5:
-            #サーバー内での管理者
-            #prefix変更
-            if content.startswith("prefix"):
-                content = rmprefix(content, "prefix")
-                if content == '':
-                    LOCAL_SETTINGS[str(guild_id)]["PREFIX"] = ""
-                    await message.channel.send(f'接頭語をなくしました')
-                    save.local_settings()
-                    return
-                LOCAL_SETTINGS[str(guild_id)]["PREFIX"] = content
-                await message.channel.send(f'接頭語を{LOCAL_SETTINGS[str(guild_id)]["PREFIX"]}に変更しました')
-                save.local_settings()
-                return
-                
-
+    
             
 
                 
