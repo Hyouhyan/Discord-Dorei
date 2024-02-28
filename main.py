@@ -154,194 +154,9 @@ async def on_message(message):
     print(f"{message.channel.id} {message.channel}メッセージ検知")
     print(f"\t{message.content}")
 
-    # ユーザーレベルの特定
-    if message.author.id in USERS["OWNER"]:
-        userLevel = 10
-    elif message.author.id in USERS["MOD"]:
-        userLevel = 9
-    else:
-        userLevel = 0
-    
-    # もしDMだったら
-    if message.guild is None:
-        # チャンネルIDをギルドIDとして扱う
-        guild_id = message.channel.id
-        if str(guild_id) not in GUILDS:
-            GUILDS[str(message.channel.id)] = f"DM with {message.author.id}"
-            initialize()
-        # サーバー管理者限定コマンドを使えるようにする
-        if(userLevel < 5):
-            userLevel = 5
-    else:
-        guild_id = message.guild.id
-    
-    
-    content = message.content
-
-    # prefixで始まってたら
-    if content.startswith(LOCAL_SETTINGS[str(guild_id)]["PREFIX"]):
-        content = rmprefix(content, LOCAL_SETTINGS[str(guild_id)]["PREFIX"])
-
-        if content == '':
-            if userLevel >= 10:
-                await message.channel.send("ようこそ、オーナー様。")
-            elif userLevel >= 9:
-                await message.channel.send("ようこそ、モデレーター様。")
-            elif userLevel >= 5:
-                await message.channel.send("ようこそ、サーバー管理者様。")
-            else:
-                await message.channel.send("オーナー様ではありませんね、お帰りください。")
-        
-        # モデレーター追加
-        if content.startswith("useradd"):
-            content = rmprefix(content, "useradd")
-            if userLevel >= 10:
-                if content.startswith("owner"):
-                    content = rmprefix(content, "owner")
-                    if(content == "" or not content.isdigit()):
-                        await message.channel.send('オーナーにするユーザーのIDを入力してください')
-                    else:
-                        user_id = int(content)
-                        user = await client.fetch_user(user_id)
-                    
-                        if(user is None):
-                            await message.channel.send(f'ユーザーは存在しません')
-                        elif(user_id in USERS["OWNER"]):
-                            await message.channel.send(f'下記ユーザーはすでにオーナーです\n`{user.name} ID:{user_id}`')
-                        else:
-                            USERS["OWNER"].append(user_id)
-                            await message.channel.send(f'下記ユーザーをオーナーに追加しました\n`{user.name} ID:{user_id}`')
-                            save.users()
-
-            if userLevel >= 9:
-                if content.startswith("mod"):
-                    content = rmprefix(content, "mod")
-                    if(content == "" or not content.isdigit()):
-                        await message.channel.send('モデレーターにするユーザーのIDを入力してください')
-                    else:
-                        user_id = int(content)
-                        user = await client.fetch_user(user_id)
-                    
-                        if(user is None):
-                            await message.channel.send(f'ユーザーは存在しません')
-                        elif(user_id in USERS["MOD"]):
-                            await message.channel.send(f'下記ユーザーはすでにモデレーターです\n`{user.name} ID:{user_id}`')
-                        else:
-                            USERS["MOD"].append(user_id)
-                            await message.channel.send(f'下記ユーザーをモデレーターに追加しました\n`{user.name} ID:{user_id}`')
-                            save.users()
-        
-        # モデレーター削除
-        if content.startswith("userdel"):
-            content = rmprefix(content, "userdel")
-            if userLevel >= 10:
-                if content.startswith("owner"):
-                    content = rmprefix(content, "owner")
-                    if(content == "" or not content.isdigit()):
-                        await message.channel.send('削除するユーザーのIDを入力してください')
-                    else:
-                        user_id = int(content)
-                        user = await client.fetch_user(user_id)
-
-                        if(user is None):
-                            await message.channel.send(f'ユーザーは存在しません')
-                        elif(not user_id in USERS["OWNER"]):
-                            await message.channel.send(f'下記ユーザーはオーナーではありません\n`{user.name} ID:{user_id}`')
-                        else:
-                            USERS["OWNER"].remove(user_id)
-                            await message.channel.send(f'下記ユーザーを削除しました\n`{user.name} ID:{user_id}`')
-                        save.users()
-
-            if userLevel >= 9:
-                if content.startswith("mod"):
-                    content = rmprefix(content, "mod")
-                    if(content == "" or not content.isdigit()):
-                        await message.channel.send('削除するユーザーのIDを入力してください')
-                    else:
-                        user_id = int(content)
-                        user = await client.fetch_user(user_id)
-
-                        if(user is None):
-                            await message.channel.send(f'ユーザーは存在しません')
-                        elif(not user_id in USERS["MOD"]):
-                            await message.channel.send(f'下記ユーザーはモデレーターではありません\n`{user.name} ID:{user_id}`')
-                        else:
-                            USERS["MOD"].remove(user_id)
-                            await message.channel.send(f'下記ユーザーを削除しました\n`{user.name} ID:{user_id}`')
-                        save.users()
-
-        
-        if userLevel >= 10:
-            #オーナー限定コマンド
-            if content.startswith("shutdown"):
-                await message.channel.send("シャットダウンしています")
-                save_all()
-                await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.offline)
-                await client.close()
-                exit()
-            
-            if content.startswith("pocket"):
-                content = rmprefix(content, "pocket")
-                if re.match(url_pattern, content):
-                    payload = {'consumer_key':GLOBAL_SETTINGS["POCKET"]["consumer_key"],'access_token':GLOBAL_SETTINGS["POCKET"]["access_token"],'url':content}
-                    r = requests.post('https://getpocket.com/v3/add', data = payload)
-                    await message.channel.send(f"`{content}`をpocketに追加しました")
-                else:
-                    await message.channel.send(f'URLを引数として渡してください。\n例) `{LOCAL_SETTINGS[str(guild_id)]["PREFIX"]}pocket https://hyouhyan.com`')
-            
-            # if content.startswith("salary"):
-            #     content = rmprefix(content, "salary")
-            #     if(content == ""):
-            #         r = requests.get(SalaryURL)
-            #         await message.channel.send(f"今月の給料 {r}円")
-            #     else:
-            #         content = content.split(' ')
-            #         r = requests.get(f"{SalaryURL}?year={content[0]}&month={int(content[1]) + 1}")
-            #         await message.channel.send(f"{content[0]}年{content[1]}月の給料 {r}円")
-                
-            
-
-        if userLevel >= 9:
-            #モデレーター限定コマンド
-            #招待リンク
-            if content.startswith("invite"):
-                await message.channel.send("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands")
-            
-            #ステータス変更
-            if content.startswith('suteme'):
-                content = rmprefix(content, "suteme")
-                GLOBAL_SETTINGS["PLAYING"] = content
-                await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
-                await message.channel.send(f'ステータスを`{GLOBAL_SETTINGS["PLAYING"]}`に変更しました')
-                save.global_settings()
-                return
-            
-            #メッセージ送信
-            if content.startswith("send"):
-                content = rmprefix(content, "send")
-                if content == '':
-                    await message.channel.send(f'{LOCAL_SETTINGS[str(guild_id)]["PREFIX"]} send `id` `送信する内容`')
-                    return
-
-                content = content.split(' ')
-                id = int(content[0])
-                content.pop(0)
-
-                botRoom = client.get_channel(id)
-                for i in content:
-                    new_content = i + ' '
-
-                await botRoom.send(new_content)
-                await message.channel.send(f'<#{id}>に送信しました。以下送信内容\n`{new_content}`')
-                return
-        
-
-    
-            
-
-                
     # オーナーのDMの場合
     if (message.guild is None) and (message.author.id in USERS["OWNER"]):
+        content = message.content
         # メッセージが4桁の数字の場合
         if (content.isdigit()) and (len(content) == 4):
             nowTime = datetime.datetime.now()
@@ -388,6 +203,27 @@ async def shutdown_command(interaction: discord.Interaction):
 async def invite_command(interaction: discord.Interaction):
     if(is_mod(interaction.user)):
         await interaction.response.send_message("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands")
+    else:
+        await interaction.response.send_message("権限がありません")
+
+@commandTree.command(name="suteme", description="Botのステータスを変更します(モデレーター以上)")
+@app_commands.describe(status="変更するステータス")
+async def suteme_command(interaction: discord.Interaction, status: str):
+    if(is_mod(interaction.user)):
+        GLOBAL_SETTINGS["PLAYING"] = status
+        await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
+        await interaction.response.send_message(f'ステータスを`{GLOBAL_SETTINGS["PLAYING"]}`に変更しました')
+        save.global_settings()
+    else:
+        await interaction.response.send_message("権限がありません")
+
+@commandTree.command(name="send", description="指定したチャンネルにメッセージを送信します(モデレーター以上)")
+@app_commands.describe(channel="送信するチャンネルのID", content="送信する内容")
+async def send_command(interaction: discord.Interaction, channel: int, content: str):
+    if(is_mod(interaction.user)):
+        botRoom = client.get_channel(channel)
+        await botRoom.send(content)
+        await interaction.response.send_message(f'<#{channel}>に送信しました。以下送信内容\n`{content}`')
     else:
         await interaction.response.send_message("権限がありません")
 
