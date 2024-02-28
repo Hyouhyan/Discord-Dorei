@@ -21,13 +21,13 @@ def idou_ymd(year, month, day):
         # エラーポイント1 オープン時のエラー
         # URLから取得
         file = requests.get(f"{IDOU_DIR_URL}{year}{tume_m}.csv").text.splitlines()
-        print(file)
+        # print(file)
         reader = csv.reader(file)
-        print(reader)
+        # print(reader)
 
         # dayに相当する要素を検索
         for i in reader:
-            print(i)
+            # print(i)
             if(i[0] == str(day)):
                 schedule = i
                 break
