@@ -154,16 +154,6 @@ async def on_message(message):
     print(f"{message.channel.id} {message.channel}メッセージ検知")
     print(f"\t{message.content}")
 
-    # logRoom = client.get_channel(1035225346431275138)
-    # embed = discord.Embed(title = message.content)
-    # try:
-    #     embed.add_field(name = "送信先", value = f"{message.guild.name} {message.channel.name}")
-    # except:
-    #     embed.add_field(name = "送信先", value = f"DM")
-    # embed.set_author(name = message.author.name,icon_url = message.author.avatar.url)
-    # embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
-    # await logRoom.send(embed = embed)
-    
     # ユーザーレベルの特定
     if message.author.id in USERS["OWNER"]:
         userLevel = 10
@@ -394,6 +384,13 @@ async def shutdown_command(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
+@commandTree.command(name="invite", description="Botの招待リンクを表示します(モデレーター以上)")
+async def invite_command(interaction: discord.Interaction):
+    if(is_mod(interaction.user)):
+        await interaction.response.send_message("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands")
+    else:
+        await interaction.response.send_message("権限がありません")
+
 
 @commandTree.command(name="qr", description="QRコードを生成します")
 async def qr_command(interaction: discord.Interaction, content: str, logo:discord.Attachment = None):
@@ -542,6 +539,17 @@ async def help_command(interaction: discord.Interaction):
     file.close()
     await interaction.response.send_message(data, ephemeral=True)
 
+
+@commandTree.command(name="whoami", description="自分の情報を表示します")
+async def whoami_command(interaction: discord.Interaction):
+    user = interaction.user
+    embed = discord.Embed(title="あなたの情報", color=discord.Colour.blue())
+    embed.set_thumbnail(url=user.avatar.url)
+    embed.add_field(name="名前", value=user.name, inline=False)
+    embed.add_field(name="ID", value=user.id, inline=False)
+    embed.add_field(name="is_owner", value=is_owner(user), inline=False)
+    embed.add_field(name="is_mod", value=is_mod(user), inline=False)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @client.event
 async def on_guild_join(guild):
