@@ -165,7 +165,7 @@ async def on_message(message):
             
             if(nowTime.hour >= 20 and nowTime.hour <= 21):
                 endTime = dakoku(content)
-                await message.channel.send(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+                await message.channel.send(f"{datetime.datetime.now.strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
 
 
 def dakoku(endTime):
@@ -185,7 +185,7 @@ def is_mod(user):
 async def dkk_command(interaction: discord.Interaction, time: int):
     if(is_owner(interaction.user)):
         endTime = dakoku(time)
-        await interaction.response.send_message(f"終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
+        await interaction.response.send_message(f"{datetime.datetime.now.strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました")
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
@@ -193,6 +193,7 @@ async def dkk_command(interaction: discord.Interaction, time: int):
 async def shutdown_command(interaction: discord.Interaction):
     if(is_owner(interaction.user)):
         save_all()
+        await interaction.response.send_message("シャットダウンします")
         await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.dnd)
         await client.close()
         exit()
@@ -202,9 +203,9 @@ async def shutdown_command(interaction: discord.Interaction):
 @commandTree.command(name="invite", description="Botの招待リンクを表示します(モデレーター以上)")
 async def invite_command(interaction: discord.Interaction):
     if(is_mod(interaction.user)):
-        await interaction.response.send_message("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands")
+        await interaction.response.send_message("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands", ephemeral=True)
     else:
-        await interaction.response.send_message("権限がありません")
+        await interaction.response.send_message("権限がありません", ephemeral=True)
 
 @commandTree.command(name="suteme", description="Botのステータスを変更します(モデレーター以上)")
 @app_commands.describe(status="変更するステータス")
@@ -219,7 +220,8 @@ async def suteme_command(interaction: discord.Interaction, status: str):
 
 @commandTree.command(name="send", description="指定したチャンネルにメッセージを送信します(モデレーター以上)")
 @app_commands.describe(channel="送信するチャンネルのID", content="送信する内容")
-async def send_command(interaction: discord.Interaction, channel: int, content: str):
+async def send_command(interaction: discord.Interaction, channel: str, content: str):
+    channel = int(channel)
     if(is_mod(interaction.user)):
         botRoom = client.get_channel(channel)
         await botRoom.send(content)
