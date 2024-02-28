@@ -362,23 +362,6 @@ async def on_message(message):
                 return
                 
 
-        if userLevel >= 0:
-            #だれでもいけるコマンド
-            if content.startswith("yummy"):
-                await message.channel.send('美味しいヤミー❗️✨🤟😁👍✨⚡️感謝❗️🙌✨感謝❗️🙌✨またいっぱい食べたいな❗️🥓🥩🍗🍖😋🍴✨デリシャッ‼️🙏✨ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬｯｯ‼😁🙏✨ハッピー🌟スマイル❗️❗️💥✨👉😁👈⭐️')
-                return
-            
-            if content.startswith("shanks"):
-                await message.channel.send('美味しいヤミー❗️✨🤟😁👍✨⚡️感謝❗️🙌✨感謝❗️🙌✨またいっぱい食べたいな❗️🥓🥩🍗🍖😋🍴✨デリシャッ‼️🙏✨ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬ‼️🙏✨ ｼｬンクスが黙ってるわけねえだろ‼️いくぞ‼️めざましジャンケン、じゃんけんポン‼️✋俺はパーをだしたぞ❓😁失せろ')
-                return
-            
-            if content.startswith("suumo"):
-                await message.channel.send('あ❗️ スーモ❗️🌚ダン💥ダン💥ダン💥シャーン🎶スモ🌝スモ🌚スモ🌝スモ🌚スモ🌝スモ🌚ス〜〜〜モ⤴スモ🌚スモ🌝スモ🌚スモ🌝スモ🌚スモ🌝ス～～～モ⤵🌞')
-                return
-            
-            if content.startswith("paku"):
-                await message.channel.send('ピピーッ❗️🔔⚡️パクツイ警察です❗️👊👮❗️アナタのツイート💕は❌パクツイ禁止法❌第114514条🙋「他人の面白そうなツイートをツイート💕してゎイケナイ❗️」に違反しています😡今スグ消しなｻｲ❗️❗️❗️❗️✌️👮🔫')
-                return
             
 
                 
