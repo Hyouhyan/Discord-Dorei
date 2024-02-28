@@ -486,17 +486,18 @@ async def bus_command(interaction: discord.Interaction, content: str = ""):
 
 
 @commandTree.command(name="idou", description="移動販売のスケジュールを表示します")
-async def idou_command(interaction: discord.Interaction, content: str = ""):
+@app_commands.describe(date="日付を指定(数字2桁 or 4桁 or 8桁, nで翌日)")
+async def idou_command(interaction: discord.Interaction, date: str = ""):
     # 日付取得
     dt_now = datetime.datetime.now()
     idou_y = (dt_now.year)
     idou_m = (dt_now.month)
     idou_d = (dt_now.day)
 
-    if content == "":
+    if date == "":
         embed = idou.idou_ymd(idou_y, idou_m, idou_d)
     
-    elif(content == "next" or content == "n"):
+    elif(date == "next" or date == "n"):
         # 翌日
         idou_d += 1
 
@@ -512,20 +513,20 @@ async def idou_command(interaction: discord.Interaction, content: str = ""):
         
         embed = idou.idou_ymd(idou_y, idou_m, idou_d)
     
-    elif(content.isdigit()):
-        if(len(content) == 2 or len(content) == 1):
+    elif(date.isdigit()):
+        if(len(date) == 2 or len(date) == 1):
             # 0詰めさせないためのint変換
-            idou_d = int(content)
+            idou_d = int(date)
             embed = idou.idou_ymd(idou_y, idou_m, idou_d)
 
-        elif(len(content) == 4):
-            result = list(content)
+        elif(len(date) == 4):
+            result = list(date)
             idou_m = int(result[0] + result[1])
             idou_d = int(result[2] + result[3])
             embed = idou.idou_ymd(idou_y, idou_m, idou_d)
         
-        elif(len(content) == 8):
-            result = list(content)
+        elif(len(date) == 8):
+            result = list(date)
             idou_y = int(result[0] + result[1] + result[2] + result[3])
             idou_m = int(result[4] + result[5])
             idou_d = int(result[6] + result[7])
@@ -556,7 +557,6 @@ async def help_command(interaction: discord.Interaction):
     file = open(HELP_PATH, 'r')
     data = file.read()
     file.close()
-    data = data.replace("==", LOCAL_SETTINGS[str(interaction.guild_id)]["PREFIX"])
     await interaction.response.send_message(data, ephemeral=True)
 
 
