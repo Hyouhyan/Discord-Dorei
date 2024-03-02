@@ -257,56 +257,7 @@ async def bus_command(interaction: discord.Interaction, time: str = ""):
 @commandTree.command(name="idou", description="移動販売のスケジュールを表示します")
 @app_commands.describe(date="日付を指定(数字2桁 or 4桁 or 8桁, nで翌日)")
 async def idou_command(interaction: discord.Interaction, date: str = ""):
-    # 日付取得
-    dt_now = datetime.datetime.now()
-    idou_y = (dt_now.year)
-    idou_m = (dt_now.month)
-    idou_d = (dt_now.day)
-
-    if date == "":
-        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-    
-    elif(date == "next" or date == "n"):
-        # 翌日
-        idou_d += 1
-
-        # 翌日が存在しない日だった場合
-        if(not checkDate(idou_y, idou_m, idou_d)):
-            idou_d = 1
-            # さらに年末だった場合
-            if(idou_m == 12):
-                idou_m = 1
-                idou_y += 1
-            else:
-                idou_m += 1
-        
-        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-    
-    elif(date.isdigit()):
-        if(len(date) == 2 or len(date) == 1):
-            # 0詰めさせないためのint変換
-            idou_d = int(date)
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-        elif(len(date) == 4):
-            result = list(date)
-            idou_m = int(result[0] + result[1])
-            idou_d = int(result[2] + result[3])
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-        
-        elif(len(date) == 8):
-            result = list(date)
-            idou_y = int(result[0] + result[1] + result[2] + result[3])
-            idou_m = int(result[4] + result[5])
-            idou_d = int(result[6] + result[7])
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-        else:
-            embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-            embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20220112`", inline=False)
-            
-            
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=idou.idou_command(date))
 
 
 @commandTree.command(name="ping", description="Ping値を表示します")
