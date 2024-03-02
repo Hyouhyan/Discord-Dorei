@@ -140,7 +140,7 @@ async def on_ready():
     print("ログイン成功")
     update_guilds()
     initialize()
-    await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
+    await client.change_presence(activity=discord.CustomActivity(name=str(GLOBAL_SETTINGS["PLAYING"])))
     await commandTree.sync()
 
 @client.event
@@ -214,7 +214,7 @@ async def invite_command(interaction: discord.Interaction):
 async def suteme_command(interaction: discord.Interaction, status: str):
     if(is_mod(interaction.user)):
         GLOBAL_SETTINGS["PLAYING"] = status
-        await client.change_presence(activity = discord.Activity(name=str(GLOBAL_SETTINGS["PLAYING"]), type=discord.ActivityType.playing))
+        await client.change_presence(activity=discord.CustomActivity(name=str(GLOBAL_SETTINGS["PLAYING"])))
         await interaction.response.send_message(f'ステータスを`{GLOBAL_SETTINGS["PLAYING"]}`に変更しました')
         save.global_settings()
     else:
