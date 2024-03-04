@@ -195,8 +195,18 @@ def is_mod(user):
     return user.id in USERS["MOD"] or is_owner(user)
 
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
-async def dkk_command(interaction: discord.Interaction, time: int):
+async def dkk_command(interaction: discord.Interaction, time: int = None, url: str = None):
     if(is_owner(interaction.user)):
+        if url:
+            GLOBAL_SETTINGS["SALARY_URL"] = url
+            save.global_settings()
+            await interaction.response.send_message(f"給料計算のURLを`{url}`に変更しました")
+            if time is None: return
+        if time is None:
+            dt_now = datetime.datetime.now()
+            # 時間を1分前にする
+            dt_now = dt_now - datetime.timedelta(minutes=1)
+            time = dt_now.strftime("%H%M")
         await interaction.response.send_message(dakoku(time))
     else:
         await interaction.response.send_message("オーナー様ではありません")
