@@ -290,19 +290,15 @@ async def ping_command(interaction: discord.Interaction):
     
     
 @commandTree.command(name="help", description="ヘルプを表示します")
-async def help_command(interaction: discord.Interaction):
-    file = open(HELP_PATH, 'r')
+async def help_command(interaction: discord.Interaction, arg: str = None):
+    if arg == "all":
+        file = open(HELPALL_PATH, 'r')
+    else:
+        file = open(HELP_PATH, 'r')
     data = file.read()
     file.close()
     await interaction.response.send_message(data, ephemeral=True)
 
-
-@commandTree.command(name="helpall", description="全てのヘルプを表示します")
-async def helpall_command(interaction: discord.Interaction):
-    file = open(HELPALL_PATH, 'r')
-    data = file.read()
-    file.close()
-    await interaction.response.send_message(data, ephemeral=True)
 
 
 @commandTree.command(name="whoami", description="自分の情報を表示します")
