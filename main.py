@@ -21,9 +21,6 @@ commandTree = app_commands.CommandTree(client)
 # URLパターン
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 
-# 給料のURL from gas
-SalaryURL = "https://script.google.com/macros/s/AKfycbzmEvS_ty_6vMTHSeEVbVry9Xhj4AlOO6xZlnOCooxjzR85rCDfCLemiqifTY2TTXZh/exec"
-
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
