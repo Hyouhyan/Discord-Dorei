@@ -251,113 +251,13 @@ async def qr_command(interaction: discord.Interaction, content: str, logo:discor
 @commandTree.command(name="bus", description="バスの時刻表を表示します")
 @app_commands.describe(time="バスの時間帯を指定(数字2桁 or 6桁, nで次の時間帯)")
 async def bus_command(interaction: discord.Interaction, time: str = ""):
-    # 日付取得
-    dt_now = datetime.datetime.now()
-    bus_y = (dt_now.year)
-    bus_m = (dt_now.month)
-    bus_d = (dt_now.day)
-    bus_h = (dt_now.hour)
-
-    if(bus_h < 8):
-        bus_h = 8
-    if(bus_h > 21):
-        bus_h = 8
-        bus_d += 1
-
-        if(not checkDate(bus_y, bus_m, bus_d)):
-            bus_d = 1
-            if(bus_m == 12):
-                bus_m = 1
-            else:
-                bus_m += 1
-
-    if time == "":
-        embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-    else:
-        if(time == "next" or time == "n"):
-            bus_h = int(bus_h) + 1
-            if(bus_h > bus.BUS_LAST):
-                bus_h = bus.BUS_FIRST
-            embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-        
-        elif(time.isdigit()):
-            if(len(time) == 2 or len(time) == 1):
-                # timeは時間帯
-                # 0詰めさせないためのint変換
-                bus_h = int(time)
-                embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-                
-            elif(len(time) == 6):
-                result = list(time)
-                bus_m = int(result[0] + result[1])
-                bus_d = int(result[2] + result[3])
-                bus_h = int(result[4] + result[5])
-
-                embed = bus.bus_mdh(bus_m, bus_d, bus_h)
-
-            else:
-                embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-                embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`bus 120120`\n本日20時台の場合\n`bus 20`", inline=False)
-
-        else:
-            embed = discord.Embed(title="エラー", description=f"指定された引数「{time}」は無効です。", color=discord.Colour.red())
-            
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=bus.bus_command(time))
 
 
 @commandTree.command(name="idou", description="移動販売のスケジュールを表示します")
 @app_commands.describe(date="日付を指定(数字2桁 or 4桁 or 8桁, nで翌日)")
 async def idou_command(interaction: discord.Interaction, date: str = ""):
-    # 日付取得
-    dt_now = datetime.datetime.now()
-    idou_y = (dt_now.year)
-    idou_m = (dt_now.month)
-    idou_d = (dt_now.day)
-
-    if date == "":
-        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-    
-    elif(date == "next" or date == "n"):
-        # 翌日
-        idou_d += 1
-
-        # 翌日が存在しない日だった場合
-        if(not checkDate(idou_y, idou_m, idou_d)):
-            idou_d = 1
-            # さらに年末だった場合
-            if(idou_m == 12):
-                idou_m = 1
-                idou_y += 1
-            else:
-                idou_m += 1
-        
-        embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-    
-    elif(date.isdigit()):
-        if(len(date) == 2 or len(date) == 1):
-            # 0詰めさせないためのint変換
-            idou_d = int(date)
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-        elif(len(date) == 4):
-            result = list(date)
-            idou_m = int(result[0] + result[1])
-            idou_d = int(result[2] + result[3])
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-        
-        elif(len(date) == 8):
-            result = list(date)
-            idou_y = int(result[0] + result[1] + result[2] + result[3])
-            idou_m = int(result[4] + result[5])
-            idou_d = int(result[6] + result[7])
-            embed = idou.idou_ymd(idou_y, idou_m, idou_d)
-
-        else:
-            embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-            embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20220112`", inline=False)
-            
-            
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=idou.idou_command(date))
 
 
 @commandTree.command(name="ping", description="Ping値を表示します")

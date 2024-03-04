@@ -1,6 +1,7 @@
 import json
 import discord
 import requests
+import datetime
 
 # バス関係のやつ
 BUS_DIAGRAM = {}
@@ -11,6 +12,15 @@ BUS_ABC_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_ABC-R5.json"
 
 BUS_LAST = 21
 BUS_FIRST = 8
+
+# 日付の整合性チェック
+def checkDate(year, month, day):
+    try:
+        newDateStr = "%04d/%02d/%02d"%(year, month, day)
+        newDate = datetime.datetime.strptime(newDateStr, "%Y/%m/%d")
+        return True
+    except:
+        return False
 
 def load():
     global BUS_DIAGRAM, BUS_ABC
@@ -98,4 +108,58 @@ def bus_mdh(bus_m, bus_d, bus_h):
         embed = discord.Embed(title="エラー", description=f"{tume_m}月{tume_d}日は対応外です", color=discord.Colour.red())
     
     return embed
-# バス関係ここまで
+
+
+def bus_command(time: str = ""):
+    # 日付取得
+    dt_now = datetime.datetime.now()
+    bus_y = (dt_now.year)
+    bus_m = (dt_now.month)
+    bus_d = (dt_now.day)
+    bus_h = (dt_now.hour)
+
+    if(bus_h < 8):
+        bus_h = 8
+    if(bus_h > 21):
+        bus_h = 8
+        bus_d += 1
+
+        if(not checkDate(bus_y, bus_m, bus_d)):
+            bus_d = 1
+            if(bus_m == 12):
+                bus_m = 1
+            else:
+                bus_m += 1
+
+    if time == "":
+        embed = bus_mdh(bus_m, bus_d, bus_h)
+    else:
+        if(time == "next" or time == "n"):
+            bus_h = int(bus_h) + 1
+            if(bus_h > BUS_LAST):
+                bus_h = BUS_FIRST
+            embed = bus_mdh(bus_m, bus_d, bus_h)
+        
+        elif(time.isdigit()):
+            if(len(time) == 2 or len(time) == 1):
+                # timeは時間帯
+                # 0詰めさせないためのint変換
+                bus_h = int(time)
+                embed = bus_mdh(bus_m, bus_d, bus_h)
+                
+            elif(len(time) == 6):
+                result = list(time)
+                bus_m = int(result[0] + result[1])
+                bus_d = int(result[2] + result[3])
+                bus_h = int(result[4] + result[5])
+
+                embed = bus_mdh(bus_m, bus_d, bus_h)
+
+            else:
+                embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
+                embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`bus 120120`\n本日20時台の場合\n`bus 20`", inline=False)
+
+        else:
+            embed = discord.Embed(title="エラー", description=f"指定された引数「{time}」は無効です。", color=discord.Colour.red())
+            
+    return embed

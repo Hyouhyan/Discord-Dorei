@@ -1,9 +1,19 @@
 import csv
 import discord
 import requests
+import datetime
 
 # 移動販売
 IDOU_DIR_URL = "https://gh.hyouhyan.com/ait-info/idou/"
+
+# 日付の整合性チェック
+def checkDate(year, month, day):
+    try:
+        newDateStr = "%04d/%02d/%02d"%(year, month, day)
+        newDate = datetime.datetime.strptime(newDateStr, "%Y/%m/%d")
+        return True
+    except:
+        return False
 
 def idou_ymd(year, month, day):
     
@@ -84,3 +94,56 @@ def idou_ymd(year, month, day):
         embed.set_footer(text="Powered by hyouhyan.com")
 
         return embed
+
+
+def idou_command(date: str = ""):
+    # 日付取得
+    dt_now = datetime.datetime.now()
+    idou_y = (dt_now.year)
+    idou_m = (dt_now.month)
+    idou_d = (dt_now.day)
+
+    if date == "":
+        embed = idou_ymd(idou_y, idou_m, idou_d)
+    
+    elif(date == "next" or date == "n"):
+        # 翌日
+        idou_d += 1
+
+        # 翌日が存在しない日だった場合
+        if(not checkDate(idou_y, idou_m, idou_d)):
+            idou_d = 1
+            # さらに年末だった場合
+            if(idou_m == 12):
+                idou_m = 1
+                idou_y += 1
+            else:
+                idou_m += 1
+        
+        embed = idou_ymd(idou_y, idou_m, idou_d)
+    
+    elif(date.isdigit()):
+        if(len(date) == 2 or len(date) == 1):
+            # 0詰めさせないためのint変換
+            idou_d = int(date)
+            embed = idou_ymd(idou_y, idou_m, idou_d)
+
+        elif(len(date) == 4):
+            result = list(date)
+            idou_m = int(result[0] + result[1])
+            idou_d = int(result[2] + result[3])
+            embed = idou_ymd(idou_y, idou_m, idou_d)
+        
+        elif(len(date) == 8):
+            result = list(date)
+            idou_y = int(result[0] + result[1] + result[2] + result[3])
+            idou_m = int(result[4] + result[5])
+            idou_d = int(result[6] + result[7])
+            embed = idou_ymd(idou_y, idou_m, idou_d)
+
+        else:
+            embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
+            embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20220112`", inline=False)
+            
+            
+    return embed
