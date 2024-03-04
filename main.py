@@ -21,14 +21,12 @@ commandTree = app_commands.CommandTree(client)
 # URLパターン
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 
-# 給料のURL from gas
-SalaryURL = "https://script.google.com/macros/s/AKfycbzmEvS_ty_6vMTHSeEVbVry9Xhj4AlOO6xZlnOCooxjzR85rCDfCLemiqifTY2TTXZh/exec"
-
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
     "TOKEN": "",
-    "PLAYING":"人生"
+    "PLAYING":"",
+    "SALARY_URL": ""
 }
 
 # ローカル(サーバーごとの)設定
@@ -95,7 +93,10 @@ def load():
     global GLOBAL_SETTINGS, LOCAL_SETTINGS, USERS
 
     file = open(GLOBAL_SETTINGS_PATH, 'r')
-    GLOBAL_SETTINGS = json.load(file)
+    settings_fromfile = json.load(file)
+    for key in settings_fromfile:
+        if GLOBAL_SETTINGS.get(key) != None: GLOBAL_SETTINGS[key] = settings_fromfile[key]
+        else: print(f"存在しないキー{key}を読み込みました at global_settings.json")
     file.close()
 
     file = open(LOCAL_SETTINGS_PATH, 'r')
@@ -103,7 +104,10 @@ def load():
     file.close()
 
     file = open(USERS_PATH, 'r')
-    USERS = json.load(file)
+    settings_fromfile = json.load(file)
+    for key in settings_fromfile:
+        if USERS.get(key) != None: USERS[key] = settings_fromfile[key]
+        else: print(f"存在しないキー{key}を読み込みました at users.json")
     file.close()
 
 #removeprefixのやつ
@@ -171,12 +175,15 @@ async def on_message(message):
 
 
 def dakoku(endTime):
-    endTime = int(endTime)          
-    r = requests.get(f"{SalaryURL}?hours={int(endTime / 100)}&minutes={endTime % 100}")
-    print(f"打刻しました。{endTime}")
-    return f"{datetime.datetime.now().strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました"
-
-    return endTime
+    endTime = int(endTime)
+    rtn = ""
+    if (GLOBAL_SETTINGS["SALARY_URL"] != ""):
+        r = requests.get(f"{GLOBAL_SETTINGS['SALARY_URL']}?hours={int(endTime / 100)}&minutes={endTime % 100}")
+        print(f"打刻しました。{endTime}")
+        rtn = f"{datetime.datetime.now().strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました"
+    else:
+        rtn = "エラー: 給料計算のURLが設定されていません"
+    return rtn
 
 def is_owner(user):
     return user.id in USERS["OWNER"]
@@ -185,8 +192,18 @@ def is_mod(user):
     return user.id in USERS["MOD"] or is_owner(user)
 
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
-async def dkk_command(interaction: discord.Interaction, time: int):
+async def dkk_command(interaction: discord.Interaction, time: int = None, url: str = None):
     if(is_owner(interaction.user)):
+        if url:
+            GLOBAL_SETTINGS["SALARY_URL"] = url
+            save.global_settings()
+            await interaction.response.send_message(f"給料計算のURLを`{url}`に変更しました")
+            if time is None: return
+        if time is None:
+            dt_now = datetime.datetime.now()
+            # 時間を1分前にする
+            dt_now = dt_now - datetime.timedelta(minutes=1)
+            time = dt_now.strftime("%H%M")
         await interaction.response.send_message(dakoku(time))
     else:
         await interaction.response.send_message("オーナー様ではありません")
