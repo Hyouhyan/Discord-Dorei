@@ -96,7 +96,6 @@ def load():
     global GLOBAL_SETTINGS, LOCAL_SETTINGS, USERS
 
     file = open(GLOBAL_SETTINGS_PATH, 'r')
-    GLOBAL_SETTINGS = json.load(file)
     file.close()
 
     file = open(LOCAL_SETTINGS_PATH, 'r')
@@ -175,7 +174,7 @@ def dakoku(endTime):
     endTime = int(endTime)
     rtn = ""
     if (GLOBAL_SETTINGS["SALARY_URL"] != ""):
-        r = requests.get(f"{GLOBAL_SETTINGS["SALARY_URL"]}?hours={int(endTime / 100)}&minutes={endTime % 100}")
+        r = requests.get(f"{GLOBAL_SETTINGS['SALARY_URL']}?hours={int(endTime / 100)}&minutes={endTime % 100}")
         print(f"打刻しました。{endTime}")
         rtn = f"{datetime.datetime.now().strftime('%m月%d日')}の終業時刻を`{int(endTime / 100)}時{endTime % 100}分`として記録しました"
     else:
