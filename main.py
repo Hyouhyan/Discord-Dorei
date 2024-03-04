@@ -28,7 +28,8 @@ SalaryURL = "https://script.google.com/macros/s/AKfycbzmEvS_ty_6vMTHSeEVbVry9Xhj
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
     "TOKEN": "",
-    "PLAYING":"人生"
+    "PLAYING":"",
+    "SALARY_URL": ""
 }
 
 # ローカル(サーバーごとの)設定
