@@ -96,6 +96,10 @@ def load():
     global GLOBAL_SETTINGS, LOCAL_SETTINGS, USERS
 
     file = open(GLOBAL_SETTINGS_PATH, 'r')
+    settings_fromfile = json.load(file)
+    for key in settings_fromfile:
+        if GLOBAL_SETTINGS.get(key) != None: GLOBAL_SETTINGS[key] = settings_fromfile[key]
+        else: print(f"存在しないキー{key}を読み込みました at global_settings.json")
     file.close()
 
     file = open(LOCAL_SETTINGS_PATH, 'r')
@@ -103,7 +107,10 @@ def load():
     file.close()
 
     file = open(USERS_PATH, 'r')
-    USERS = json.load(file)
+    settings_fromfile = json.load(file)
+    for key in settings_fromfile:
+        if USERS.get(key) != None: USERS[key] = settings_fromfile[key]
+        else: print(f"存在しないキー{key}を読み込みました at users.json")
     file.close()
 
 #removeprefixのやつ
