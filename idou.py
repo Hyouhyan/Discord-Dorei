@@ -143,7 +143,7 @@ def idou_command(date: str = ""):
 
         else:
             embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-            embed.add_field(name="記述例", value=f"今月20日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20`\n12月1日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 1201`\n2022年1月12日の場合\n`{LOCAL_SETTINGS[str(interaction.guild_id)]['PREFIX']}idou 20220112`", inline=False)
+            embed.add_field(name="記述例", value=f"今月20日の場合\n`/idou 20`\n12月1日の場合\n`/idou 1201`\n2022年1月12日の場合\n`/idou 20220112`", inline=False)
             
             
     return embed
