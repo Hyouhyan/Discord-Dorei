@@ -157,7 +157,7 @@ def bus_command(time: str = ""):
 
             else:
                 embed = discord.Embed(title="エラー", description=f"日時の指定方法が違います。", color=discord.Colour.red())
-                embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`bus 120120`\n本日20時台の場合\n`bus 20`", inline=False)
+                embed.add_field(name="記述例", value=f"12月1日20時台の場合\n`/bus 120120`\n本日20時台の場合\n`/bus 20`", inline=False)
 
         else:
             embed = discord.Embed(title="エラー", description=f"指定された引数「{time}」は無効です。", color=discord.Colour.red())
