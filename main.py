@@ -280,7 +280,7 @@ async def whoami_command(interaction: discord.Interaction):
 async def control_command(interaction: discord.Interaction):
     if(is_mod(interaction.user)):
         view = manageCommand()
-        await interaction.response.send_message("管理画面", view=view)
+        await interaction.response.send_message("ようこそ、モデレーター様", view=view)
     else:
         await interaction.response.send_message("権限がありません")
 
@@ -302,11 +302,14 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
     
     @discord.ui.button(label="shutdown", style=discord.ButtonStyle.primary)
     async def shutdown(self, interaction: discord.Interaction, button: discord.ui.Button):
-        save_all()
-        await interaction.response.send_message("シャットダウンします")
-        await client.change_presence(activity=discord.CustomActivity(name = "シャットダウン中"), status = discord.Status.dnd)
-        await client.close()
-        exit()
+        if(is_owner(interaction.user)):
+            save_all()
+            await interaction.response.send_message("シャットダウンします")
+            await client.change_presence(activity=discord.CustomActivity(name = "シャットダウン中"), status = discord.Status.dnd)
+            await client.close()
+            exit()
+        else:
+            await interaction.response.send_message("オーナー様限定のコマンドです")
     
     @discord.ui.button(label="invite", style=discord.ButtonStyle.primary)
     async def invite(self, interaction: discord.Interaction, button: discord.ui.Button):
