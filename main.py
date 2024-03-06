@@ -294,6 +294,16 @@ async def whois(interaction: discord.Interaction, user: discord.User):
     embed.add_field(name="is_mod", value=is_mod(user), inline=False)
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+@commandTree.context_menu(name = "魚拓")
+async def gyotaku(interaction: discord.Interaction, message: discord.Message):
+    embed = discord.Embed(title = message.content)
+    try:
+        embed.add_field(name = "送信先", value = f"{message.guild.name} {message.channel.name}")
+    except:
+        embed.add_field(name = "送信先", value = f"DM")
+    embed.set_author(name = message.author.name,icon_url = message.author.avatar.url)
+    embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
+    await interaction.response.send_message(embed = embed)
 
 @client.event
 async def on_guild_join(guild):
