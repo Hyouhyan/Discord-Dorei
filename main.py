@@ -317,6 +317,14 @@ async def whoami_command(interaction: discord.Interaction):
     embed.add_field(name="is_mod", value=is_mod(user), inline=False)
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+@commandTree.command(name="control", description="Botの管理(モデレーター以上)")
+async def control_command(interaction: discord.Interaction):
+    if(is_mod(interaction.user)):
+        view = manageCommand()
+        await interaction.response.send_message("管理画面", view=view)
+    else:
+        await interaction.response.send_message("権限がありません")
+
 @client.event
 async def on_guild_join(guild):
     print(f"サーバー{guild}に参加したよー")
@@ -327,5 +335,57 @@ async def on_guild_join(guild):
 async def on_guild_remove(guild):
     print(f"サーバー{guild}から消されたよー")
     update_guilds()
+
+
+class manageCommand(discord.ui.View): # UIキットを利用するためにdiscord.ui.Viewを継承する
+    def __init__(self, timeout=180): # Viewにはtimeoutがあり、初期値は180(s)である
+        super().__init__(timeout=timeout)
+    
+    @discord.ui.button(label="shutdown", style=discord.ButtonStyle.primary)
+    async def shutdown(self, interaction: discord.Interaction, button: discord.ui.Button):
+        save_all()
+        await interaction.response.send_message("シャットダウンします")
+        await client.change_presence(activity=discord.CustomActivity(name = "シャットダウン中"), status = discord.Status.dnd)
+        await client.close()
+        exit()
+    
+    @discord.ui.button(label="invite", style=discord.ButtonStyle.primary)
+    async def invite(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
+    
+    @discord.ui.button(label="send", style=discord.ButtonStyle.primary)
+    async def send(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = sendMessage()
+        await interaction.response.send_modal(modal)
+
+    
+class sendMessage(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="送信先とメッセージの設定",
+            timeout=None
+        )
+    
+        self.channelid = discord.ui.TextInput(
+            label = "チャンネルID",
+            placeholder = "チャンネルIDを入力",
+            required = True
+        )
+        self.add_item(self.channelid)
+        
+        self.content = discord.ui.TextInput(
+            label = "送信内容",
+            placeholder = "送信する内容を入力",
+            required = True
+        )
+        self.add_item(self.content)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        botRoom = client.get_channel(int(self.channelid.value))
+        await botRoom.send(self.content.value)
+        await interaction.response.send_message(f"送信先: {self.channelid.value}\n内容: {self.content.value}")
+        return
+        
+
 
 client.run(GLOBAL_SETTINGS["TOKEN"])
