@@ -269,7 +269,7 @@ async def help_command(interaction: discord.Interaction, arg: str = None):
 async def whoami_command(interaction: discord.Interaction):
     user = interaction.user
     embed = discord.Embed(title="あなたの情報", color=discord.Colour.blue())
-    embed.set_thumbnail(url=user.avatar.url)
+    embed.set_thumbnail(url=user.display_avatar.url)
     embed.add_field(name="名前", value=user.name, inline=False)
     embed.add_field(name="ID", value=user.id, inline=False)
     embed.add_field(name="is_owner", value=is_owner(user), inline=False)
@@ -283,6 +283,17 @@ async def control_command(interaction: discord.Interaction):
         await interaction.response.send_message("ようこそ、モデレーター様", view=view, ephemeral=True)
     else:
         await interaction.response.send_message("権限がありません")
+
+@commandTree.context_menu(name = "whois")
+async def whois(interaction: discord.Interaction, user: discord.User):
+    embed = discord.Embed(title=f"Who is {user.name}", color=discord.Colour.blue())
+    embed.set_thumbnail(url=user.display_avatar.url)
+    embed.add_field(name="名前", value=user.name, inline=False)
+    embed.add_field(name="ID", value=user.id, inline=False)
+    embed.add_field(name="is_owner", value=is_owner(user), inline=False)
+    embed.add_field(name="is_mod", value=is_mod(user), inline=False)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 @client.event
 async def on_guild_join(guild):
