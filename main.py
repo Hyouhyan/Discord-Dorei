@@ -343,7 +343,8 @@ class sendMessage(discord.ui.Modal):
         self.content = discord.ui.TextInput(
             label = "送信内容",
             placeholder = "送信する内容を入力",
-            required = True
+            required = True,
+            style = discord.TextStyle.paragraph
         )
         self.add_item(self.content)
     
