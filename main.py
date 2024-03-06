@@ -350,7 +350,7 @@ class sendMessage(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         botRoom = client.get_channel(int(self.channelid.value))
         await botRoom.send(self.content.value)
-        await interaction.response.send_message(f"送信先: {self.channelid.value}\n内容: {self.content.value}")
+        await interaction.response.send_message(f'<#{self.channelid.value}>に送信しました。以下送信内容\n`{self.content.value}`')
         return
 
 class changeStatus(discord.ui.Modal):
