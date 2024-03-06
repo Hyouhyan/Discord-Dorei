@@ -21,6 +21,8 @@ commandTree = app_commands.CommandTree(client)
 # URLパターン
 url_pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 
+APPLICATION_ID = 0
+
 # グローバル(全部共通の)設定
 GLOBAL_SETTINGS_PATH = "./data/global_settings.json"
 GLOBAL_SETTINGS = {
@@ -146,6 +148,9 @@ async def on_ready():
     initialize()
     await client.change_presence(activity=discord.CustomActivity(name=str(GLOBAL_SETTINGS["PLAYING"])))
     await commandTree.sync()
+    
+    global APPLICATION_ID
+    APPLICATION_ID = client.application_id
 
 @client.event
 async def on_message(message):
@@ -222,7 +227,7 @@ async def shutdown_command(interaction: discord.Interaction):
 @commandTree.command(name="invite", description="Botの招待リンクを表示します(モデレーター以上)")
 async def invite_command(interaction: discord.Interaction):
     if(is_mod(interaction.user)):
-        await interaction.response.send_message("https://discord.com/api/oauth2/authorize?client_id=991156508781969438&permissions=8&scope=bot%20applications.commands", ephemeral=True)
+        await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
     else:
         await interaction.response.send_message("権限がありません", ephemeral=True)
 
