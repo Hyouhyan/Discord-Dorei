@@ -300,7 +300,7 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
     def __init__(self, timeout=180): # Viewにはtimeoutがあり、初期値は180(s)である
         super().__init__(timeout=timeout)
     
-    @discord.ui.button(label="shutdown", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="シャットダウン", style=discord.ButtonStyle.secondary)
     async def shutdown(self, interaction: discord.Interaction, button: discord.ui.Button):
         if(is_owner(interaction.user)):
             save_all()
@@ -311,16 +311,16 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
         else:
             await interaction.response.send_message("オーナー様限定のコマンドです")
     
-    @discord.ui.button(label="invite", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="招待URL生成", style=discord.ButtonStyle.secondary)
     async def invite(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
     
-    @discord.ui.button(label="send", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="メッセージ送信", style=discord.ButtonStyle.secondary)
     async def send(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = sendMessage()
         await interaction.response.send_modal(modal)
     
-    @discord.ui.button(label="suteme", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="ステメ変更", style=discord.ButtonStyle.secondary)
     async def suteme(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = changeStatus()
         await interaction.response.send_modal(modal)
