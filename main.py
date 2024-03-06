@@ -213,47 +213,6 @@ async def dkk_command(interaction: discord.Interaction, time: int = None, url: s
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
-@commandTree.command(name="shutdown", description="Botをシャットダウンします。(オーナー様専用)")
-async def shutdown_command(interaction: discord.Interaction):
-    if(is_owner(interaction.user)):
-        save_all()
-        await interaction.response.send_message("シャットダウンします")
-        await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.dnd)
-        await client.close()
-        exit()
-    else:
-        await interaction.response.send_message("オーナー様ではありません")
-
-@commandTree.command(name="invite", description="Botの招待リンクを表示します(モデレーター以上)")
-async def invite_command(interaction: discord.Interaction):
-    if(is_mod(interaction.user)):
-        await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
-    else:
-        await interaction.response.send_message("権限がありません", ephemeral=True)
-
-@commandTree.command(name="suteme", description="Botのステータスを変更します(モデレーター以上)")
-@app_commands.describe(status="変更するステータス")
-async def suteme_command(interaction: discord.Interaction, status: str):
-    if(is_mod(interaction.user)):
-        GLOBAL_SETTINGS["PLAYING"] = status
-        await client.change_presence(activity=discord.CustomActivity(name=str(GLOBAL_SETTINGS["PLAYING"])))
-        await interaction.response.send_message(f'ステータスを`{GLOBAL_SETTINGS["PLAYING"]}`に変更しました')
-        save.global_settings()
-    else:
-        await interaction.response.send_message("権限がありません")
-
-@commandTree.command(name="send", description="指定したチャンネルにメッセージを送信します(モデレーター以上)")
-@app_commands.describe(channel="送信するチャンネルのID", content="送信する内容")
-async def send_command(interaction: discord.Interaction, channel: str, content: str):
-    channel = int(channel)
-    if(is_mod(interaction.user)):
-        botRoom = client.get_channel(channel)
-        await botRoom.send(content)
-        await interaction.response.send_message(f'<#{channel}>に送信しました。以下送信内容\n`{content}`')
-    else:
-        await interaction.response.send_message("権限がありません")
-
-
 @commandTree.command(name="qr", description="QRコードを生成します")
 async def qr_command(interaction: discord.Interaction, content: str, logo:discord.Attachment = None):
     QR_TEMP_PATH = "./temp/qr.png"
