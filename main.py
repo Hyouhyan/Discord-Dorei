@@ -357,6 +357,11 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
     async def send(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = sendMessage()
         await interaction.response.send_modal(modal)
+    
+    @discord.ui.button(label="suteme", style=discord.ButtonStyle.primary)
+    async def suteme(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = changeStatus()
+        await interaction.response.send_modal(modal)
 
     
 class sendMessage(discord.ui.Modal):
@@ -385,7 +390,26 @@ class sendMessage(discord.ui.Modal):
         await botRoom.send(self.content.value)
         await interaction.response.send_message(f"送信先: {self.channelid.value}\n内容: {self.content.value}")
         return
-        
+
+class changeStatus(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="ステータス変更",
+            timeout=None
+        )
+    
+        self.status = discord.ui.TextInput(
+            label = "ステータス",
+            placeholder = "ステータスを入力",
+            required = True
+        )
+        self.add_item(self.status)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        GLOBAL_SETTINGS["PLAYING"] = self.status.value
+        await client.change_presence(activity=discord.CustomActivity(name = GLOBAL_SETTINGS["PLAYING"]))
+        await interaction.response.send_message(f"ステータスを{GLOBAL_SETTINGS['PLAYING']}に変更しました")
+        return
 
 
 client.run(GLOBAL_SETTINGS["TOKEN"])
