@@ -280,7 +280,7 @@ async def whoami_command(interaction: discord.Interaction):
 async def control_command(interaction: discord.Interaction):
     if(is_mod(interaction.user)):
         view = manageCommand()
-        await interaction.response.send_message("ようこそ、モデレーター様", view=view)
+        await interaction.response.send_message("ようこそ、モデレーター様", view=view, ephemeral=True)
     else:
         await interaction.response.send_message("権限がありません")
 
