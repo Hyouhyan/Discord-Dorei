@@ -213,47 +213,6 @@ async def dkk_command(interaction: discord.Interaction, time: int = None, url: s
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
-@commandTree.command(name="shutdown", description="Botをシャットダウンします。(オーナー様専用)")
-async def shutdown_command(interaction: discord.Interaction):
-    if(is_owner(interaction.user)):
-        save_all()
-        await interaction.response.send_message("シャットダウンします")
-        await client.change_presence(activity=discord.Game(name=f"シャットダウン中"), status=discord.Status.dnd)
-        await client.close()
-        exit()
-    else:
-        await interaction.response.send_message("オーナー様ではありません")
-
-@commandTree.command(name="invite", description="Botの招待リンクを表示します(モデレーター以上)")
-async def invite_command(interaction: discord.Interaction):
-    if(is_mod(interaction.user)):
-        await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
-    else:
-        await interaction.response.send_message("権限がありません", ephemeral=True)
-
-@commandTree.command(name="suteme", description="Botのステータスを変更します(モデレーター以上)")
-@app_commands.describe(status="変更するステータス")
-async def suteme_command(interaction: discord.Interaction, status: str):
-    if(is_mod(interaction.user)):
-        GLOBAL_SETTINGS["PLAYING"] = status
-        await client.change_presence(activity=discord.CustomActivity(name=str(GLOBAL_SETTINGS["PLAYING"])))
-        await interaction.response.send_message(f'ステータスを`{GLOBAL_SETTINGS["PLAYING"]}`に変更しました')
-        save.global_settings()
-    else:
-        await interaction.response.send_message("権限がありません")
-
-@commandTree.command(name="send", description="指定したチャンネルにメッセージを送信します(モデレーター以上)")
-@app_commands.describe(channel="送信するチャンネルのID", content="送信する内容")
-async def send_command(interaction: discord.Interaction, channel: str, content: str):
-    channel = int(channel)
-    if(is_mod(interaction.user)):
-        botRoom = client.get_channel(channel)
-        await botRoom.send(content)
-        await interaction.response.send_message(f'<#{channel}>に送信しました。以下送信内容\n`{content}`')
-    else:
-        await interaction.response.send_message("権限がありません")
-
-
 @commandTree.command(name="qr", description="QRコードを生成します")
 async def qr_command(interaction: discord.Interaction, content: str, logo:discord.Attachment = None):
     QR_TEMP_PATH = "./temp/qr.png"
@@ -317,6 +276,14 @@ async def whoami_command(interaction: discord.Interaction):
     embed.add_field(name="is_mod", value=is_mod(user), inline=False)
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+@commandTree.command(name="control", description="Botの管理(モデレーター以上)")
+async def control_command(interaction: discord.Interaction):
+    if(is_mod(interaction.user)):
+        view = manageCommand()
+        await interaction.response.send_message("ようこそ、モデレーター様", view=view)
+    else:
+        await interaction.response.send_message("権限がありません")
+
 @client.event
 async def on_guild_join(guild):
     print(f"サーバー{guild}に参加したよー")
@@ -327,5 +294,84 @@ async def on_guild_join(guild):
 async def on_guild_remove(guild):
     print(f"サーバー{guild}から消されたよー")
     update_guilds()
+
+
+class manageCommand(discord.ui.View): # UIキットを利用するためにdiscord.ui.Viewを継承する
+    def __init__(self, timeout=180): # Viewにはtimeoutがあり、初期値は180(s)である
+        super().__init__(timeout=timeout)
+    
+    @discord.ui.button(label="シャットダウン", style=discord.ButtonStyle.secondary)
+    async def shutdown(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if(is_owner(interaction.user)):
+            save_all()
+            await interaction.response.send_message("シャットダウンします")
+            await client.change_presence(activity=discord.CustomActivity(name = "シャットダウン中"), status = discord.Status.dnd)
+            await client.close()
+            exit()
+        else:
+            await interaction.response.send_message("オーナー様限定のコマンドです")
+    
+    @discord.ui.button(label="招待URL生成", style=discord.ButtonStyle.secondary)
+    async def invite(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={APPLICATION_ID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
+    
+    @discord.ui.button(label="メッセージ送信", style=discord.ButtonStyle.secondary)
+    async def send(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = sendMessage()
+        await interaction.response.send_modal(modal)
+    
+    @discord.ui.button(label="ステメ変更", style=discord.ButtonStyle.secondary)
+    async def suteme(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = changeStatus()
+        await interaction.response.send_modal(modal)
+
+    
+class sendMessage(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="送信先とメッセージの設定",
+            timeout=None
+        )
+    
+        self.channelid = discord.ui.TextInput(
+            label = "チャンネルID",
+            placeholder = "チャンネルIDを入力",
+            required = True
+        )
+        self.add_item(self.channelid)
+        
+        self.content = discord.ui.TextInput(
+            label = "送信内容",
+            placeholder = "送信する内容を入力",
+            required = True
+        )
+        self.add_item(self.content)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        botRoom = client.get_channel(int(self.channelid.value))
+        await botRoom.send(self.content.value)
+        await interaction.response.send_message(f"送信先: {self.channelid.value}\n内容: {self.content.value}")
+        return
+
+class changeStatus(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="ステータス変更",
+            timeout=None
+        )
+    
+        self.status = discord.ui.TextInput(
+            label = "ステータス",
+            placeholder = "ステータスを入力",
+            required = True
+        )
+        self.add_item(self.status)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        GLOBAL_SETTINGS["PLAYING"] = self.status.value
+        await client.change_presence(activity=discord.CustomActivity(name = GLOBAL_SETTINGS["PLAYING"]))
+        await interaction.response.send_message(f"ステータスを{GLOBAL_SETTINGS['PLAYING']}に変更しました")
+        return
+
 
 client.run(GLOBAL_SETTINGS["TOKEN"])
