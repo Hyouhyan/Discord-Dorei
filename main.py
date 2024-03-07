@@ -284,6 +284,12 @@ async def control_command(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("権限がありません")
 
+
+@commandTree.command(name="invite", description="Bot招待リンクの生成")
+async def control_command(interaction: discord.Interaction, applicationID: str):
+    await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={applicationID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
+
+
 @commandTree.context_menu(name = "whois")
 async def whois(interaction: discord.Interaction, user: discord.User):
     embed = discord.Embed(title=f"Who is {user.name}", color=discord.Colour.blue())
