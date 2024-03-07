@@ -213,6 +213,10 @@ async def dkk_command(interaction: discord.Interaction, time: int = None, url: s
     else:
         await interaction.response.send_message("オーナー様ではありません")
 
+@commandTree.command(name="invite", description="Botの招待リンクを生成します")
+async def invite_command(interaction: discord.Interaction, app_id: str):
+    await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={app_id}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
+
 @commandTree.command(name="qr", description="QRコードを生成します")
 async def qr_command(interaction: discord.Interaction, content: str, logo:discord.Attachment = None):
     QR_TEMP_PATH = "./temp/qr.png"
@@ -283,11 +287,6 @@ async def control_command(interaction: discord.Interaction):
         await interaction.response.send_message("ようこそ、モデレーター様", view=view, ephemeral=True)
     else:
         await interaction.response.send_message("権限がありません")
-
-
-@commandTree.command(name="invite", description="Bot招待リンクの生成")
-async def invite_command(interaction: discord.Interaction, applicationID: str):
-    await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={applicationID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
 
 
 @commandTree.context_menu(name = "whois")
