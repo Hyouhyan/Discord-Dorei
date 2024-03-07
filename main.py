@@ -286,7 +286,7 @@ async def control_command(interaction: discord.Interaction):
 
 
 @commandTree.command(name="invite", description="Bot招待リンクの生成")
-async def control_command(interaction: discord.Interaction, applicationID: str):
+async def invite_command(interaction: discord.Interaction, applicationID: str):
     await interaction.response.send_message(f"https://discord.com/api/oauth2/authorize?client_id={applicationID}&permissions=8&scope=bot%20applications.commands", ephemeral=True)
 
 
