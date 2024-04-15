@@ -1,0 +1,6 @@
+beautifulsoup4
+discord.py==2.3.2
+Pillow
+qrcode
+Requests
+datetimejp
