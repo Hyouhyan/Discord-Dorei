@@ -7,8 +7,8 @@ import datetime
 BUS_DIAGRAM = {}
 BUS_ABC = {}
 
-BUS_DIAGRAM_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_diagram-R5.json"
-BUS_ABC_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_ABC-R5.json"
+BUS_DIAGRAM_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_diagram-R6.json"
+BUS_ABC_URL = "https://gh.hyouhyan.com/ait-info/bus/bus_ABC-R6.json"
 
 BUS_LAST = 21
 BUS_FIRST = 8
