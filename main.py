@@ -197,13 +197,8 @@ def is_mod(user):
     return user.id in USERS["MOD"] or is_owner(user)
 
 @commandTree.command(name="dkk", description="退勤時間を打刻します。(オーナー様専用)")
-async def dkk_command(interaction: discord.Interaction, time: int = None, url: str = None):
+async def dkk_command(interaction: discord.Interaction, time: int = None):
     if(is_owner(interaction.user)):
-        if url:
-            GLOBAL_SETTINGS["SALARY_URL"] = url
-            save.global_settings()
-            await interaction.response.send_message(f"給料計算のURLを`{url}`に変更しました")
-            if time is None: return
         if time is None:
             dt_now = datetime.datetime.now()
             # 時間を1分前にする
@@ -350,6 +345,11 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
     async def suteme(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = changeStatus()
         await interaction.response.send_modal(modal)
+    
+    @discord.ui.button(label="打刻URL変更", style=discord.ButtonStyle.secondary)
+    async def salaryurl(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = salaryURL()
+        await interaction.response.send_modal(modal)
 
     
 class sendMessage(discord.ui.Modal):
@@ -398,7 +398,27 @@ class changeStatus(discord.ui.Modal):
         GLOBAL_SETTINGS["PLAYING"] = self.status.value
         await client.change_presence(activity=discord.CustomActivity(name = GLOBAL_SETTINGS["PLAYING"]))
         await interaction.response.send_message(f"ステータスを{GLOBAL_SETTINGS['PLAYING']}に変更しました")
+        save.global_settings()
         return
 
+class salaryURL(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="打刻URL変更",
+            timeout=None
+        )
+    
+        self.url = discord.ui.TextInput(
+            label = "URL",
+            placeholder = "URLを入力",
+            required = True
+        )
+        self.add_item(self.url)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        GLOBAL_SETTINGS["SALARY_URL"] = self.url.value
+        await interaction.response.send_message(f"打刻URLを`{self.url.value}`に変更しました")
+        save.global_settings()
+        return
 
 client.run(GLOBAL_SETTINGS["TOKEN"])
