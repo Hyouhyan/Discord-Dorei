@@ -4,7 +4,7 @@ import requests
 import datetime
 
 # 移動販売
-IDOU_DIR_URL = "https://gh.hyouhyan.com/ait-info/idou/"
+IDOU_DIR_URL = "https://hyouhyan.github.io/ait-info/idou/"
 
 # 日付の整合性チェック
 def checkDate(year, month, day):
