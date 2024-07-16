@@ -13,8 +13,8 @@ dtnow = datetime.datetime.now()
 WAREKI_NOW = JDate(year=dtnow.year, month=dtnow.month, day=dtnow.day)
 WAREKI_NOW = WAREKI_NOW.strftime("%-g%-e")
 
-BUS_DIAGRAM_URL = f"https://gh.hyouhyan.com/ait-info/bus/bus_diagram-{WAREKI_NOW}.json"
-BUS_ABC_URL = f"https://gh.hyouhyan.com/ait-info/bus/bus_ABC-{WAREKI_NOW}.json"
+BUS_DIAGRAM_URL = f"https://hyouhyan.github.io/ait-info/bus/bus_diagram-{WAREKI_NOW}.json"
+BUS_ABC_URL = f"https://hyouhyan.github.io/ait-info/bus/bus_ABC-{WAREKI_NOW}.json"
 
 BUS_LAST = 21
 BUS_FIRST = 8
