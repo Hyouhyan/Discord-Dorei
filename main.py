@@ -314,6 +314,7 @@ jinro_urls = []
 async def jinro_add(interaction: discord.Interaction, url: str):
     jinro_urls.append(url)
     await interaction.response.send_message("追加完了", ephemeral=True)
+    await interaction.message.send_message(f"追加済み{interaction.user.display_name}")
 
 @commandTree.command(name="jinro_pop", description="人狼URLを1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
