@@ -7,6 +7,8 @@ import requests
 import os
 import qrcode
 
+import random
+
 # Local
 import bus
 import idou
@@ -304,6 +306,30 @@ async def gyotaku(interaction: discord.Interaction, message: discord.Message):
     embed.set_author(name = message.author.name,icon_url = message.author.avatar.url)
     embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
     await interaction.response.send_message(embed = embed)
+
+jinro_urls = []
+
+@commandTree.command(name="jinro_add", description="人狼用URL追加")
+@app_commands.describe(url="URL指定")
+async def jinro_add(interaction: discord.Interaction, url: str):
+    jinro_urls.append(url)
+    await interaction.response.send_message("追加完了", ephemeral=True)
+
+@commandTree.command(name="jinro_pop", description="人狼URLを1つ取り出し")
+async def jinro_pop(interaction: discord.Interaction):
+    if len(jinro_urls) > 0:
+        # ランダムに取り出し
+        jinro_url = random.choice(jinro_urls)
+        # 取り出したやつ削除
+        jinro_urls.remove(jinro_url)
+        await interaction.response.send_message(jinro_url)
+    else:
+        await interaction.response.send_message("URLがありません")
+
+@commandTree.command(name="jinro_clear", description="人狼URLを全て削除")
+async def jinro_clear(interaction: discord.Interaction):
+    jinro_urls.clear()
+    await interaction.response.send_message("全削除完了")
 
 @client.event
 async def on_guild_join(guild):
