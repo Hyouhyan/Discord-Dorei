@@ -309,14 +309,14 @@ async def gyotaku(interaction: discord.Interaction, message: discord.Message):
 
 jinro_urls = []
 
-@commandTree.command(name="jinro_add", description="人狼用URL追加")
-@app_commands.describe(url="URL指定")
-async def jinro_add(interaction: discord.Interaction, url: str):
-    jinro_urls.append(url)
+@commandTree.command(name="jinro_add", description="人狼用ワード追加")
+@app_commands.describe(word="ワードかurl")
+async def jinro_add(interaction: discord.Interaction, word: str):
+    jinro_urls.append(word)
     await interaction.response.send_message("追加完了", ephemeral=True)
     await interaction.message.send_message(f"追加済み{interaction.user.display_name}")
 
-@commandTree.command(name="jinro_pop", description="人狼URLを1つ取り出し")
+@commandTree.command(name="jinro_pop", description="ワードを1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
     if len(jinro_urls) > 0:
         # ランダムに取り出し
@@ -325,9 +325,9 @@ async def jinro_pop(interaction: discord.Interaction):
         jinro_urls.remove(jinro_url)
         await interaction.response.send_message(jinro_url)
     else:
-        await interaction.response.send_message("URLがありません")
+        await interaction.response.send_message("データがありません")
 
-@commandTree.command(name="jinro_clear", description="人狼URLを全て削除")
+@commandTree.command(name="jinro_clear", description="ワードを全て削除")
 async def jinro_clear(interaction: discord.Interaction):
     jinro_urls.clear()
     await interaction.response.send_message("全削除完了")
