@@ -336,6 +336,8 @@ async def jinro_clear(interaction: discord.Interaction):
     
 @commandTree.command(name="jinro_status", description="ワードの数を表示")
 async def jinro_status(interaction: discord.Interaction):
+    if not interaction.guild_id in jinro_urls:
+        jinro_urls[interaction.guild_id] = []
     await interaction.response.send_message(f"ワードの数：{len(jinro_urls[interaction.guild_id])}")
 
 @client.event
