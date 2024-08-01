@@ -318,7 +318,7 @@ async def jinro_add(interaction: discord.Interaction, word: str):
     await interaction.response.send_message("追加完了", ephemeral=True)
     await interaction.channel.send(f"データが追加されました(個数：{len(jinro_urls[interaction.guild_id])})")
 
-@commandTree.command(name="lot_pop", description="データを1つ取り出し")
+@commandTree.command(name="lot_pop", description="登録された抽選データから1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
     if len(jinro_urls[interaction.guild_id]) > 0:
         # ランダムに取り出し
