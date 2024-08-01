@@ -333,7 +333,10 @@ async def jinro_pop(interaction: discord.Interaction):
 async def jinro_clear(interaction: discord.Interaction):
     jinro_urls[interaction.guild_id].clear()
     await interaction.response.send_message("全削除完了")
-
+    
+@commandTree.command(name="jinro_status", description="ワードの数を表示")
+async def jinro_status(interaction: discord.Interaction):
+    await interaction.response.send_message(f"ワードの数：{len(jinro_urls[interaction.guild_id])}")
 
 @client.event
 async def on_guild_join(guild):
