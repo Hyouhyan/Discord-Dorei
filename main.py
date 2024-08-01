@@ -309,8 +309,8 @@ async def gyotaku(interaction: discord.Interaction, message: discord.Message):
 
 jinro_urls = {}
 
-@commandTree.command(name="jinro_add", description="人狼用ワード追加")
-@app_commands.describe(word="ワードかurl")
+@commandTree.command(name="lot_add", description="抽選用のデータを追加")
+@app_commands.describe(word="ワード, urlなど")
 async def jinro_add(interaction: discord.Interaction, word: str):
     # wordを追加
     jinro_urls.setdefault(interaction.guild_id, [])
@@ -318,7 +318,7 @@ async def jinro_add(interaction: discord.Interaction, word: str):
     await interaction.response.send_message("追加完了", ephemeral=True)
     await interaction.channel.send(f"データが追加されました(個数：{len(jinro_urls[interaction.guild_id])})")
 
-@commandTree.command(name="jinro_pop", description="ワードを1つ取り出し")
+@commandTree.command(name="lot_pop", description="データを1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
     if len(jinro_urls[interaction.guild_id]) > 0:
         # ランダムに取り出し
@@ -329,16 +329,16 @@ async def jinro_pop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("データがありません")
 
-@commandTree.command(name="jinro_clear", description="ワードを全て削除")
+@commandTree.command(name="lot_clear", description="抽選用のデータを全て削除")
 async def jinro_clear(interaction: discord.Interaction):
     jinro_urls[interaction.guild_id].clear()
     await interaction.response.send_message("全削除完了")
     
-@commandTree.command(name="jinro_status", description="ワードの数を表示")
+@commandTree.command(name="lot_status", description="抽選用データ数を表示")
 async def jinro_status(interaction: discord.Interaction):
     if not interaction.guild_id in jinro_urls:
         jinro_urls[interaction.guild_id] = []
-    await interaction.response.send_message(f"ワードの数：{len(jinro_urls[interaction.guild_id])}")
+    await interaction.response.send_message(f"データの数：{len(jinro_urls[interaction.guild_id])}")
 
 @client.event
 async def on_guild_join(guild):
