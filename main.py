@@ -307,31 +307,33 @@ async def gyotaku(interaction: discord.Interaction, message: discord.Message):
     embed.set_footer(text = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S'))
     await interaction.response.send_message(embed = embed)
 
-jinro_urls = []
+jinro_urls = {}
 
 @commandTree.command(name="jinro_add", description="人狼用ワード追加")
 @app_commands.describe(word="ワードかurl")
 async def jinro_add(interaction: discord.Interaction, word: str):
-    jinro_urls.append(word)
+    # wordを追加
+    jinro_urls.setdefault(interaction.guild_id, [])
+    jinro_urls[interaction.guild_id].append(word)
     await interaction.response.send_message("追加完了", ephemeral=True)
-    # await interaction.channel.send(f"追加済み{interaction.user.display_name}")
-    await interaction.channel.send(f"データが追加されました(個数：{len(jinro_urls)})")
+    await interaction.channel.send(f"データが追加されました(個数：{len(jinro_urls[interaction.guild_id])})")
 
 @commandTree.command(name="jinro_pop", description="ワードを1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
-    if len(jinro_urls) > 0:
+    if len(jinro_urls[interaction.guild_id]) > 0:
         # ランダムに取り出し
-        jinro_url = random.choice(jinro_urls)
+        jinro_url = random.choice(jinro_urls[interaction.guild_id])
         # 取り出したやつ削除
-        jinro_urls.remove(jinro_url)
+        jinro_urls[interaction.guild_id].remove(jinro_url)
         await interaction.response.send_message(jinro_url)
     else:
         await interaction.response.send_message("データがありません")
 
 @commandTree.command(name="jinro_clear", description="ワードを全て削除")
 async def jinro_clear(interaction: discord.Interaction):
-    jinro_urls.clear()
+    jinro_urls[interaction.guild_id].clear()
     await interaction.response.send_message("全削除完了")
+
 
 @client.event
 async def on_guild_join(guild):
