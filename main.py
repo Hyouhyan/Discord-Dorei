@@ -314,7 +314,8 @@ jinro_urls = []
 async def jinro_add(interaction: discord.Interaction, word: str):
     jinro_urls.append(word)
     await interaction.response.send_message("追加完了", ephemeral=True)
-    await interaction.channel.send(f"追加済み{interaction.user.display_name}")
+    # await interaction.channel.send(f"追加済み{interaction.user.display_name}")
+    await interaction.channel.send(f"データが追加されました(個数：{word.size()})")
 
 @commandTree.command(name="jinro_pop", description="ワードを1つ取り出し")
 async def jinro_pop(interaction: discord.Interaction):
