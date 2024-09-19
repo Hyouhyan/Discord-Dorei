@@ -165,6 +165,7 @@ async def on_message(message):
     print(f"{message.channel.id} {message.channel}メッセージ検知")
     print(f"\t{message.content}")
     
+    # 旧コマンドの移管案内
     if message.content in ["idou", "bus", "==idou", "==bus"]:
         await message.channel.send("該当コマンドはスラッシュコマンドに移行しました。`/help`で確認してください。")
 
