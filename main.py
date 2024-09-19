@@ -55,6 +55,12 @@ HELPALL_PATH = "./data/help_other.txt"
 GUILDS_PATH = "./data/guilds.json"
 GUILDS = {}
 
+# 研究室とEmojiの対応表
+LAB_EMOJI = {
+    "内藤研": "naito_ken",
+    "梶研": "kaji_ken"
+}
+
 # 日付の整合性チェック
 def checkDate(year, month, day):
     try:
@@ -139,6 +145,12 @@ def update_guilds():
         GUILDS[str(guilds.id)] = guilds.name
     save.guilds()
     print("サーバー辞書更新")
+    
+def get_emoji_by_name(name, guild):
+    for emoji in guild.emojis:
+        if emoji.name == name:
+            return str(emoji)
+    return ""
 
 # ここから本編
 load()
@@ -168,6 +180,10 @@ async def on_message(message):
     # 旧コマンドの移管案内
     if message.content in ["idou", "bus", "==idou", "==bus"]:
         await message.channel.send("該当コマンドはスラッシュコマンドに移行しました。`/help`で確認してください。")
+    
+    # 研究室の名称検知時
+    if message.content in LAB_EMOJI:
+        await message.add_reaction(get_emoji_by_name(LAB_EMOJI[message.content], message.guild))
 
     # オーナーのDMの場合
     if (message.guild is None) and (message.author.id in USERS["OWNER"]):
