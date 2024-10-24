@@ -182,8 +182,9 @@ async def on_message(message):
         await message.channel.send("該当コマンドはスラッシュコマンドに移行しました。`/help`で確認してください。")
     
     # 研究室の名称検知時
-    if message.content in LAB_EMOJI:
-        await message.add_reaction(get_emoji_by_name(LAB_EMOJI[message.content], message.guild))
+    for lab in LAB_EMOJI:
+        if lab in message.content:
+            await message.add_reaction(get_emoji_by_name(LAB_EMOJI[lab], message.guild))
 
     # オーナーのDMの場合
     if (message.guild is None) and (message.author.id in USERS["OWNER"]):
