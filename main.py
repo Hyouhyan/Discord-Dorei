@@ -192,14 +192,17 @@ async def on_message(message):
         print(f"dice検知: {dice}, {dice.split('d')[0]}, {dice.split('d')[1]}")
         dice_num = int(dice.split('d')[0])
         dice_max = int(dice.split('d')[1])
+
+        rtn = ""
         
-        DICE_NUM_LIMIT = 10
+        DICE_NUM_LIMIT = 100
         if dice_num > DICE_NUM_LIMIT:
             await message.channel.send(f"ダイスの数が多すぎます(上限: {DICE_NUM_LIMIT})")
             return
 
         for i in range(dice_num):
-            await message.channel.send(f"{dice}({i+1}回目): {random.randint(1, dice_max)}")
+            rtn += f"{dice}({i+1}回目): {random.randint(1, dice_max)}\n"
+        await message.channel.send(rtn)
 
 
     # オーナーのDMの場合
