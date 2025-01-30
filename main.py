@@ -186,9 +186,9 @@ async def on_message(message):
         if lab in message.content:
             await message.add_reaction(get_emoji_by_name(LAB_EMOJI[lab], message.guild))
 
-    # diceの正規表現に一致する文字列を検知
-    dices = re.findall("\d+d\d+", message.content)
-    for dice in dices:
+    # diceの正規表現に一致するか確認
+    if re.fullmatch("\d+d\d+", message.content):
+        dice = message.content
         print(f"dice検知: {dice}, {dice.split('d')[0]}, {dice.split('d')[1]}")
         dice_num = int(dice.split('d')[0])
         dice_max = int(dice.split('d')[1])
