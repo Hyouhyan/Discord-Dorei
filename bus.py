@@ -11,6 +11,11 @@ BUS_ABC = {}
 dtnow = datetime.datetime.now()
 
 WAREKI_NOW = JDate(year=dtnow.year, month=dtnow.month, day=dtnow.day)
+# 1~3月の場合は前年の年号になる
+if WAREKI_NOW.month < 4:
+    # prev_yearを使うために一度datetimeに変換
+    WAREKI_NOW = JDate(year=dtnow.year-1, month=dtnow.month, day=dtnow.day)
+# 和暦の年号を取得
 WAREKI_NOW = WAREKI_NOW.strftime("%-g%-e")
 
 BUS_DIAGRAM_URL = f"https://hyouhyan.github.io/ait-info/bus/bus_diagram-{WAREKI_NOW}.json"
