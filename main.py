@@ -423,6 +423,11 @@ class manageCommand(discord.ui.View): # UIキットを利用するためにdisco
         modal = salaryURL()
         await interaction.response.send_modal(modal)
 
+    @discord.ui.button(label="メッセージ削除", style=discord.ButtonStyle.secondary)
+    async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = deleteMessage()
+        await interaction.response.send_modal(modal)
+
     
 class sendMessage(discord.ui.Modal):
     def __init__(self):
@@ -491,6 +496,26 @@ class salaryURL(discord.ui.Modal):
         GLOBAL_SETTINGS["SALARY_URL"] = self.url.value
         await interaction.response.send_message(f"打刻URLを`{self.url.value}`に変更しました")
         save.global_settings()
+        return
+
+class deleteMessage(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            title="メッセージ削除",
+            timeout=None
+        )
+    
+        self.messageid = discord.ui.TextInput(
+            label = "メッセージID",
+            placeholder = "メッセージIDを入力",
+            required = True
+        )
+        self.add_item(self.messageid)
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        message = await interaction.channel.fetch_message(int(self.messageid.value))
+        await message.delete()
+        await interaction.response.send_message(f"メッセージID: `{self.messageid.value}`を削除しました", ephemeral=True)
         return
 
 client.run(GLOBAL_SETTINGS["TOKEN"])
